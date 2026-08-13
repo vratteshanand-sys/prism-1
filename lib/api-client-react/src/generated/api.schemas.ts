@@ -23,6 +23,8 @@ export interface Finding {
   title: string;
   detail: string;
   severity: FindingSeverity;
+  /** @nullable */
+  regulation?: string | null;
 }
 
 export type VulnerabilitySeverity = typeof VulnerabilitySeverity[keyof typeof VulnerabilitySeverity];

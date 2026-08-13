@@ -14,39 +14,54 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getRiskColor } from "@/lib/risk-utils";
-import { Search, Link as LinkIcon, FileText, Cookie, AlertTriangle, AlertCircle } from "lucide-react";
+import { Search, Link as LinkIcon, FileText, Cookie, AlertTriangle, AlertCircle, ClipboardList, Scale } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MODULES } from "@/lib/modules";
 import { ModuleBanner, Explainer } from "@/components/teachy";
+import { ShareButton } from "@/components/share-button";
+
+/** Regulation citation chip — shown on findings that map to a specific compliance clause */
+function RegulationTag({ regulation }: { regulation?: string | null }) {
+  if (!regulation) return null;
+  return (
+    <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full uppercase bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300">
+      <Scale className="w-2.5 h-2.5" /> {regulation}
+    </span>
+  );
+}
 
 export default function TrustLens() {
   return (
     <div className="flex-1 overflow-y-auto bg-noise">
       <div className="p-8 max-w-7xl mx-auto space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-cyan-600 dark:text-cyan-400">TrustLens</h1>
-          <p className="text-muted-foreground mt-2">Comprehensive suite for analyzing URLs, privacy policies, dark patterns, and threat intel.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-cyan-600 dark:text-cyan-400">TrustLens Compliance Audit</h1>
+          <p className="text-muted-foreground mt-2">Automated GDPR, CCPA, and dark-pattern compliance screening for URLs, privacy policies, and cookie consent flows — with regulation citations and exportable audit reports.</p>
         </div>
 
         <ModuleBanner theme={MODULES.trustlens} />
-        <Explainer label="What are dark patterns?">
-          Dark patterns are design tricks that push you into choices you would not
-          make on your own — like a giant "Accept all" button next to a hidden
-          "Reject" link, or guilt-trip wording. TrustLens spots those tricks in links,
-          privacy policies, and cookie banners so you can see the manipulation before
-          it works on you.
+        <Explainer label="What does a compliance screen check?">
+          TrustLens screens URLs, privacy policies, and cookie consent banners against
+          patterns regulators flag under GDPR, CCPA, and the EU's dark-pattern rules —
+          things like consent bundling, hidden reject options, and vague retention
+          language. Each finding cites the specific regulation it may implicate where
+          applicable. This is an automated first-pass screen, not legal advice — use it
+          to triage what a human reviewer should look at next.
         </Explainer>
 
         <Tabs defaultValue="url" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto md:h-14 bg-muted/50 p-1 rounded-xl gap-1">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto md:h-14 bg-muted/50 p-1 rounded-xl gap-1">
             <TabsTrigger value="url" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2">
-              <LinkIcon className="w-4 h-4" /> URL Inspector
+              <LinkIcon className="w-4 h-4" /> URL Screen
             </TabsTrigger>
             <TabsTrigger value="policy" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2">
-              <FileText className="w-4 h-4" /> Policy Analyzer
+              <FileText className="w-4 h-4" /> Policy Review
             </TabsTrigger>
             <TabsTrigger value="cookie" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2">
-              <Cookie className="w-4 h-4" /> Cookie Decoder
+              <Cookie className="w-4 h-4" /> Consent Check
+            </TabsTrigger>
+            <TabsTrigger value="trail" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2">
+              <ClipboardList className="w-4 h-4" /> Audit Trail
             </TabsTrigger>
             <TabsTrigger value="threat" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2">
               <AlertTriangle className="w-4 h-4" /> Threat Intel
@@ -62,6 +77,9 @@ export default function TrustLens() {
             </TabsContent>
             <TabsContent value="cookie">
               <CookieDecoder />
+            </TabsContent>
+            <TabsContent value="trail">
+              <AuditTrail />
             </TabsContent>
             <TabsContent value="threat">
               <ThreatIntel />
@@ -92,13 +110,13 @@ function UrlInspector() {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <Card className="glass-panel">
         <CardHeader>
-          <CardTitle>Inspect URL</CardTitle>
-          <CardDescription>Check a link for phishing and deception signals.</CardDescription>
+          <CardTitle>URL Compliance Screen</CardTitle>
+          <CardDescription>Check a link for phishing, deception, and dark-pattern signals, with regulation citations.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Input placeholder="https://example.com" value={url} onChange={e => setUrl(e.target.value)} />
           <Button className="w-full" disabled={!url || createReq.isPending} onClick={handleRun}>
-            {createReq.isPending ? "Inspecting..." : "Scan URL"}
+            {createReq.isPending ? "Screening..." : "Run Compliance Screen"}
           </Button>
 
           {createReq.data && (
@@ -112,17 +130,28 @@ function UrlInspector() {
                 </div>
               </div>
               <p className="text-sm font-medium mb-4">{createReq.data.aiSummary}</p>
-              
+
               <div className="space-y-3 mt-4">
                 {createReq.data.findings.map((f, i) => (
                   <div key={i} className="flex gap-3 text-sm p-3 bg-background rounded border">
                     <AlertCircle className={`w-4 h-4 shrink-0 mt-0.5 ${f.severity === 'high' || f.severity === 'critical' ? 'text-destructive' : 'text-amber-600 dark:text-amber-400'}`} />
-                    <div>
+                    <div className="space-y-1">
                       <div className="font-bold">{f.title}</div>
                       <div className="text-muted-foreground">{f.detail}</div>
+                      <RegulationTag regulation={f.regulation} />
                     </div>
                   </div>
                 ))}
+              </div>
+
+              <div className="mt-5 pt-4 border-t flex justify-end">
+                <ShareButton
+                  module="TrustLens · URL Compliance Screen"
+                  title={url}
+                  riskScore={createReq.data.riskScore}
+                  aiSummary={createReq.data.aiSummary}
+                  findings={createReq.data.findings}
+                />
               </div>
             </div>
           )}
@@ -183,25 +212,25 @@ function PolicyAnalyzer() {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <Card className="glass-panel">
         <CardHeader>
-          <CardTitle>Privacy Policy Analyzer</CardTitle>
-          <CardDescription>Extract red flags and user rights from privacy policies.</CardDescription>
+          <CardTitle>Privacy Policy Compliance Review</CardTitle>
+          <CardDescription>Extract regulation-mapped red flags and user rights from a privacy policy.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Textarea placeholder="Paste privacy policy text..." className="min-h-[200px]" value={text} onChange={e => setText(e.target.value)} />
           <Button className="w-full" disabled={!text || createReq.isPending} onClick={handleRun}>
-            {createReq.isPending ? "Analyzing Policy..." : "Analyze Policy"}
+            {createReq.isPending ? "Reviewing Policy..." : "Run Compliance Review"}
           </Button>
 
           {createReq.data && (
             <div className="mt-8 p-6 bg-muted/30 rounded-lg border border-border/50 animate-in fade-in slide-in-from-bottom-4">
               <div className="flex items-center justify-between mb-4">
-                <div className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Analysis Result</div>
+                <div className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Compliance Review Result</div>
                 <div className={`font-mono font-bold text-2xl ${getRiskColor(createReq.data.riskScore)}`}>
                   {createReq.data.riskScore}/100 Risk
                 </div>
               </div>
               <p className="text-sm font-medium mb-6">{createReq.data.aiSummary}</p>
-              
+
               <div className="grid grid-cols-2 gap-4 text-sm mb-6">
                 <div className="p-3 bg-background rounded border">
                   <div className="font-bold text-muted-foreground mb-1 text-xs uppercase">Data Retention</div>
@@ -220,12 +249,23 @@ function PolicyAnalyzer() {
                 {createReq.data.redFlags.map((f, i) => (
                   <div key={i} className="flex gap-3 text-sm p-3 bg-background rounded border border-red-500/20">
                     <AlertCircle className={`w-4 h-4 shrink-0 mt-0.5 text-red-500`} />
-                    <div>
+                    <div className="space-y-1">
                       <div className="font-bold text-red-700 dark:text-red-400">{f.title}</div>
                       <div className="text-muted-foreground text-xs mt-1">{f.detail}</div>
+                      <RegulationTag regulation={f.regulation} />
                     </div>
                   </div>
                 ))}
+              </div>
+
+              <div className="mt-5 pt-4 border-t flex justify-end">
+                <ShareButton
+                  module="TrustLens · Privacy Policy Compliance Review"
+                  title={text.slice(0, 80)}
+                  riskScore={createReq.data.riskScore}
+                  aiSummary={createReq.data.aiSummary}
+                  findings={createReq.data.redFlags}
+                />
               </div>
             </div>
           )}
@@ -282,13 +322,13 @@ function CookieDecoder() {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <Card className="glass-panel">
         <CardHeader>
-          <CardTitle>Cookie Decoder</CardTitle>
-          <CardDescription>Analyze cookie consent banners for manipulation and dark patterns.</CardDescription>
+          <CardTitle>Cookie Consent Compliance Check</CardTitle>
+          <CardDescription>Analyze cookie consent banners for manipulation, dark patterns, and consent defects.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Textarea placeholder="Paste cookie banner text..." className="min-h-[200px]" value={text} onChange={e => setText(e.target.value)} />
           <Button className="w-full" disabled={!text || createReq.isPending} onClick={handleRun}>
-            {createReq.isPending ? "Decoding..." : "Decode Banner"}
+            {createReq.isPending ? "Checking Consent Flow..." : "Run Consent Check"}
           </Button>
 
           {createReq.data && (
@@ -302,18 +342,29 @@ function CookieDecoder() {
                 </div>
               </div>
               <p className="text-sm font-medium mb-4">{createReq.data.aiSummary}</p>
-              
+
               <div className="space-y-3 mt-4">
                 <div className="font-bold text-sm">Detected Tactics</div>
                 {createReq.data.tactics.map((f, i) => (
                   <div key={i} className="flex gap-3 text-sm p-3 bg-background rounded border">
                     <AlertCircle className={`w-4 h-4 shrink-0 mt-0.5 ${f.severity === 'high' || f.severity === 'critical' ? 'text-destructive' : 'text-amber-600 dark:text-amber-400'}`} />
-                    <div>
+                    <div className="space-y-1">
                       <div className="font-bold">{f.title}</div>
                       <div className="text-muted-foreground text-xs mt-1">{f.detail}</div>
+                      <RegulationTag regulation={f.regulation} />
                     </div>
                   </div>
                 ))}
+              </div>
+
+              <div className="mt-5 pt-4 border-t flex justify-end">
+                <ShareButton
+                  module="TrustLens · Cookie Consent Compliance Check"
+                  title={text.slice(0, 80)}
+                  riskScore={createReq.data.manipulationScore}
+                  aiSummary={createReq.data.aiSummary}
+                  findings={createReq.data.tactics}
+                />
               </div>
             </div>
           )}
@@ -349,6 +400,99 @@ function CookieDecoder() {
               ))}
             </TableBody>
           </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+type AuditRow = {
+  id: number;
+  type: "URL Screen" | "Policy Review" | "Consent Check";
+  label: string;
+  score: number;
+  regulationCount: number;
+  createdAt: string;
+};
+
+function AuditTrail() {
+  const { data: urls } = useListUrlInspections({ query: { queryKey: getListUrlInspectionsQueryKey() } });
+  const { data: policies } = useListPolicyAnalyses({ query: { queryKey: getListPolicyAnalysesQueryKey() } });
+  const { data: cookies } = useListCookieAnalyses({ query: { queryKey: getListCookieAnalysesQueryKey() } });
+
+  const rows: AuditRow[] = [
+    ...(urls ?? []).map((r): AuditRow => ({
+      id: r.id, type: "URL Screen", label: r.url, score: r.riskScore,
+      regulationCount: r.findings.filter(f => f.regulation).length, createdAt: r.createdAt,
+    })),
+    ...(policies ?? []).map((r): AuditRow => ({
+      id: r.id, type: "Policy Review", label: r.excerpt, score: r.riskScore,
+      regulationCount: r.redFlags.filter(f => f.regulation).length, createdAt: r.createdAt,
+    })),
+    ...(cookies ?? []).map((r): AuditRow => ({
+      id: r.id, type: "Consent Check", label: r.excerpt, score: r.manipulationScore,
+      regulationCount: r.tactics.filter(f => f.regulation).length, createdAt: r.createdAt,
+    })),
+  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  const totalRegulationCitations = rows.reduce((sum, r) => sum + r.regulationCount, 0);
+  const isLoading = !urls || !policies || !cookies;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="glass-panel"><CardContent className="p-4">
+          <div className="text-xs uppercase text-muted-foreground font-bold">Total Screens</div>
+          <div className="text-2xl font-mono font-bold mt-1">{rows.length}</div>
+        </CardContent></Card>
+        <Card className="glass-panel"><CardContent className="p-4">
+          <div className="text-xs uppercase text-muted-foreground font-bold">Regulation Citations</div>
+          <div className="text-2xl font-mono font-bold mt-1 text-cyan-600 dark:text-cyan-400">{totalRegulationCitations}</div>
+        </CardContent></Card>
+        <Card className="glass-panel"><CardContent className="p-4">
+          <div className="text-xs uppercase text-muted-foreground font-bold">URL Screens</div>
+          <div className="text-2xl font-mono font-bold mt-1">{urls?.length ?? 0}</div>
+        </CardContent></Card>
+        <Card className="glass-panel"><CardContent className="p-4">
+          <div className="text-xs uppercase text-muted-foreground font-bold">Policy + Consent Reviews</div>
+          <div className="text-2xl font-mono font-bold mt-1">{(policies?.length ?? 0) + (cookies?.length ?? 0)}</div>
+        </CardContent></Card>
+      </div>
+
+      <Card className="glass-panel">
+        <CardHeader>
+          <CardTitle>Unified Audit Trail</CardTitle>
+          <CardDescription>Every compliance screen run across TrustLens, in one chronological log.</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="p-12 text-center animate-pulse text-sm text-muted-foreground">Loading audit trail...</div>
+          ) : rows.length === 0 ? (
+            <div className="p-12 text-center text-sm text-muted-foreground">No compliance screens run yet.</div>
+          ) : (
+            <Table>
+              <TableHeader className="bg-muted/50 sticky top-0">
+                <TableRow>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Subject</TableHead>
+                  <TableHead>Regulations Cited</TableHead>
+                  <TableHead className="text-right">Score</TableHead>
+                  <TableHead className="text-right">Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {rows.map((r) => (
+                  <TableRow key={`${r.type}-${r.id}`}>
+                    <TableCell><Badge variant="outline" className="text-[0.65rem] uppercase">{r.type}</Badge></TableCell>
+                    <TableCell className="font-mono text-xs truncate max-w-[280px]">{r.label}</TableCell>
+                    <TableCell className="text-xs">{r.regulationCount > 0 ? r.regulationCount : "—"}</TableCell>
+                    <TableCell className={`text-right font-mono font-bold ${getRiskColor(r.score)}`}>{r.score}</TableCell>
+                    <TableCell className="text-right text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

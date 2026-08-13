@@ -704,6 +704,7 @@ components:
         severity:
           type: string
           enum: [low, medium, high, critical]
+        regulation: { type: ["string", "null"] }
     Vulnerability:
       type: object
       required: [packageName, version, vulnId, severity, summary]

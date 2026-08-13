@@ -11,4 +11,6 @@ export interface Finding {
   title: string;
   detail: string;
   severity: FindingSeverity;
+  /** @nullable */
+  regulation?: string | null;
 }

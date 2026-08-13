@@ -237,7 +237,8 @@ export const ListUrlInspectionsResponseItem = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "aiSummary": zod.string()
 })
@@ -263,7 +264,8 @@ export const CreateUrlInspectionResponse = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "aiSummary": zod.string()
 })
@@ -280,7 +282,8 @@ export const ListPolicyAnalysesResponseItem = zod.object({
   "redFlags": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "userRights": zod.array(zod.string()),
   "retention": zod.string(),
@@ -307,7 +310,8 @@ export const CreatePolicyAnalysisResponse = zod.object({
   "redFlags": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "userRights": zod.array(zod.string()),
   "retention": zod.string(),
@@ -327,7 +331,8 @@ export const ListCookieAnalysesResponseItem = zod.object({
   "tactics": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "aiSummary": zod.string()
 })
@@ -353,7 +358,8 @@ export const CreateCookieAnalysisResponse = zod.object({
   "tactics": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "aiSummary": zod.string()
 })
@@ -468,7 +474,8 @@ export const ListDeviceScansResponseItem = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "signals": zod.array(zod.object({
   "label": zod.string(),
@@ -539,7 +546,8 @@ export const CreateDeviceScanResponse = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "signals": zod.array(zod.object({
   "label": zod.string(),
@@ -572,7 +580,8 @@ export const GetDeviceScanResponse = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "signals": zod.array(zod.object({
   "label": zod.string(),
@@ -624,7 +633,8 @@ export const ListDeepScansResponseItem = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "aiSummary": zod.string().nullable()
 })
@@ -662,7 +672,8 @@ export const CreateDeepScanResponse = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "aiSummary": zod.string().nullable()
 })
@@ -699,7 +710,8 @@ export const GetPendingDeepScanResponse = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "aiSummary": zod.string().nullable()
 })
@@ -740,7 +752,8 @@ export const GetDeepScanResponse = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "aiSummary": zod.string().nullable()
 })
@@ -833,7 +846,8 @@ export const ListGuardScansResponseItem = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "aiSummary": zod.string().nullable()
 })
@@ -889,7 +903,8 @@ export const CreateGuardScanResponse = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "aiSummary": zod.string().nullable()
 })
@@ -948,7 +963,8 @@ export const GetGuardScanResponse = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "aiSummary": zod.string().nullable()
 })
@@ -1009,7 +1025,8 @@ export const CreateShareBody = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "posture": zod.unknown().optional()
 })
@@ -1037,7 +1054,8 @@ export const GetShareResponse = zod.object({
   "findings": zod.array(zod.object({
   "title": zod.string(),
   "detail": zod.string(),
-  "severity": zod.enum(['low', 'medium', 'high', 'critical'])
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "regulation": zod.string().nullish()
 })),
   "posture": zod.unknown().optional(),
   "createdAt": zod.string()

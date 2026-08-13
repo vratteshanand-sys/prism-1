@@ -1,8 +1,9 @@
 import { useParams } from "wouter";
 import { useGetShare, getGetShareQueryKey } from "@workspace/api-client-react";
 import type { Finding } from "@workspace/api-client-react";
-import { Shield, AlertTriangle, CheckCircle, Info, Loader2 } from "lucide-react";
+import { Shield, AlertTriangle, CheckCircle, Info, Loader2, Printer, Scale } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ScoreRing } from "@/components/score-ring";
 
 function severityIcon(severity: string) {
@@ -70,7 +71,7 @@ export default function SharePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="border-b bg-card px-6 py-4 flex items-center justify-between">
+      <header className="border-b bg-card px-6 py-4 flex items-center justify-between print:hidden">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-md bg-gradient-to-br from-orange-500 to-purple-600 flex items-center justify-center">
             <Shield className="w-4 h-4 text-white" />
@@ -80,10 +81,21 @@ export default function SharePage() {
             <div className="text-xs text-muted-foreground">Know it like you know you</div>
           </div>
         </div>
-        <div className="text-xs text-muted-foreground">
-          Shared scan summary · {new Date(data.createdAt).toLocaleDateString()}
+        <div className="flex items-center gap-3">
+          <div className="text-xs text-muted-foreground">
+            Shared scan summary · {new Date(data.createdAt).toLocaleDateString()}
+          </div>
+          <Button size="sm" variant="outline" onClick={() => window.print()}>
+            <Printer className="w-3.5 h-3.5 mr-1.5" /> Print / Save as PDF
+          </Button>
         </div>
       </header>
+
+      {/* Print-only letterhead */}
+      <div className="hidden print:block px-4 pt-8 pb-2">
+        <div className="text-lg font-bold tracking-tight">PRISM Compliance Audit Report</div>
+        <div className="text-xs text-muted-foreground">Generated {new Date(data.createdAt).toLocaleString()} · Automated screen, not legal advice</div>
+      </div>
 
       <main className="max-w-2xl mx-auto px-4 py-10 space-y-8">
         {/* Title + module */}
@@ -147,6 +159,11 @@ export default function SharePage() {
                       >
                         {f.severity}
                       </span>
+                      {f.regulation && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full uppercase bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300">
+                          <Scale className="w-2.5 h-2.5" /> {f.regulation}
+                        </span>
+                      )}
                     </div>
                     <p className="text-sm text-muted-foreground mt-0.5 leading-snug">
                       {f.detail}

@@ -31,6 +31,7 @@ interface FindingAi {
   title: string;
   detail: string;
   severity: string;
+  regulation?: string | null;
 }
 
 function normalizeFindings(items: FindingAi[] | undefined): FindingAi[] {
@@ -38,14 +39,17 @@ function normalizeFindings(items: FindingAi[] | undefined): FindingAi[] {
     title: String(f.title ?? ""),
     detail: String(f.detail ?? ""),
     severity: normalizeSeverity(f.severity),
+    regulation: f.regulation ? String(f.regulation) : null,
   }));
 }
 
 // ---------- URL Inspector ----------
 
-const URL_PROMPT = `You are TrustLens URL Inspector, an educational tool that flags POTENTIALLY manipulative or risky characteristics of a URL. Analyze the URL string itself (structure, domain, TLD, keywords, lookalike patterns, tracking parameters, URL shorteners, punycode, excessive subdomains). Use careful language ("potentially", "may indicate") — you cannot browse the URL.
+const URL_PROMPT = `You are TrustLens URL Inspector, a compliance-audit tool that flags POTENTIALLY manipulative or risky characteristics of a URL for a compliance/security reviewer. Analyze the URL string itself (structure, domain, TLD, keywords, lookalike patterns, tracking parameters, URL shorteners, punycode, excessive subdomains). Use careful, non-definitive language ("potentially", "may indicate") — you cannot browse the URL, and this is not legal advice.
 
-Respond as JSON: {"verdict": one of "safe"|"suspicious"|"dangerous"|"critical", "riskScore": 0-100, "findings":[{"title":s,"detail":s,"severity":"low"|"medium"|"high"|"critical"}], "summary": 2-4 plain-language sentences for a non-technical user}`;
+For each finding, if it plausibly implicates a specific regulation, cite it in "regulation" (e.g. "GDPR Art. 5(1)(a) — lawfulness/transparency", "FTC Act Sec. 5 — deceptive practices"). Use null when no specific regulation applies.
+
+Respond as JSON: {"verdict": one of "safe"|"suspicious"|"dangerous"|"critical", "riskScore": 0-100, "findings":[{"title":s,"detail":s,"severity":"low"|"medium"|"high"|"critical","regulation":s|null}], "summary": 2-4 sentences for a compliance reviewer, noting this is an automated screen, not legal advice}`;
 
 router.get("/trustlens/url-inspections", async (_req, res): Promise<void> => {
   const rows = await db
@@ -98,9 +102,11 @@ router.post("/trustlens/url-inspections", async (req, res): Promise<void> => {
 
 // ---------- Privacy Policy Analyzer ----------
 
-const POLICY_PROMPT = `You are TrustLens Privacy Policy Analyzer, an educational tool that translates privacy policies into plain language and flags POTENTIALLY concerning clauses (data selling/sharing, broad licenses, vague retention, arbitration clauses, tracking, third-party sharing). Use careful language ("potentially", "may").
+const POLICY_PROMPT = `You are TrustLens Privacy Policy Analyzer, a compliance-audit tool that reviews privacy policies for a compliance reviewer and flags POTENTIALLY concerning clauses (data selling/sharing, broad licenses, vague retention, arbitration clauses, tracking, third-party sharing, missing legal basis, missing/weak deletion or access rights). Use careful, non-definitive language ("potentially", "may") — this is not legal advice.
 
-Respond as JSON: {"riskScore": 0-100, "redFlags":[{"title":s,"detail":s,"severity":"low"|"medium"|"high"|"critical"}], "userRights":[array of plain-language rights the user retains, e.g. deletion, access, opt-out], "retention": one-sentence plain-language description of data retention, "summary": 3-5 plain-language sentences}`;
+For each red flag, if it plausibly implicates a specific regulation, cite it in "regulation" (e.g. "GDPR Art. 13 — information to be provided", "CCPA Cal. Civ. Code §1798.100 — right to know", "GDPR Art. 17 — right to erasure"). Use null when no specific regulation applies.
+
+Respond as JSON: {"riskScore": 0-100, "redFlags":[{"title":s,"detail":s,"severity":"low"|"medium"|"high"|"critical","regulation":s|null}], "userRights":[array of plain-language rights the policy grants the user, e.g. deletion, access, opt-out], "retention": one-sentence plain-language description of data retention, "summary": 3-5 sentences for a compliance reviewer, noting this is an automated screen, not legal advice}`;
 
 router.get("/trustlens/policy-analyses", async (_req, res): Promise<void> => {
   const rows = await db
@@ -149,9 +155,11 @@ router.post("/trustlens/policy-analyses", async (req, res): Promise<void> => {
 
 // ---------- Cookie Banner Decoder ----------
 
-const COOKIE_PROMPT = `You are TrustLens Cookie Banner Decoder, an educational tool that analyzes cookie consent banner text for POTENTIALLY manipulative design tactics (confirmshaming, pre-ticked boxes, hidden reject options, misleading button hierarchy, forced consent bundling, vague purposes). Use careful language.
+const COOKIE_PROMPT = `You are TrustLens Cookie Banner Decoder, a compliance-audit tool that analyzes cookie consent banner text for a compliance reviewer, flagging POTENTIALLY manipulative design tactics and consent defects (confirmshaming, pre-ticked boxes, hidden reject options, misleading button hierarchy, forced consent bundling, vague purposes, no equal-prominence reject option). Use careful, non-definitive language — this is not legal advice.
 
-Respond as JSON: {"manipulationScore": 0-100, "verdict": one of "fair"|"questionable"|"manipulative"|"deceptive", "tactics":[{"title":s,"detail":s,"severity":"low"|"medium"|"high"|"critical"}], "summary": 2-4 plain-language sentences}`;
+For each tactic, if it plausibly implicates a specific regulation, cite it in "regulation" (e.g. "ePrivacy Directive Art. 5(3) — consent for cookies", "GDPR Art. 7(3) — withdrawal as easy as giving consent", "EU DSA Art. 25 — dark patterns"). Use null when no specific regulation applies.
+
+Respond as JSON: {"manipulationScore": 0-100, "verdict": one of "fair"|"questionable"|"manipulative"|"deceptive", "tactics":[{"title":s,"detail":s,"severity":"low"|"medium"|"high"|"critical","regulation":s|null}], "summary": 2-4 sentences for a compliance reviewer, noting this is an automated screen, not legal advice}`;
 
 router.get("/trustlens/cookie-analyses", async (_req, res): Promise<void> => {
   const rows = await db

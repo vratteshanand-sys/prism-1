@@ -225,3 +225,17 @@
   .score-ring-arc { animation: none; transition: none; }
   .rise-in        { animation: none; }
 }
+
+/* Compliance report printing — force light background, avoid splitting findings across pages */
+@media print {
+  html.dark {
+    color-scheme: light;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  section > div > div {
+    break-inside: avoid;
+  }
+}
