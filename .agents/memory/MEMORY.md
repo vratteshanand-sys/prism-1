@@ -1,0 +1,3 @@
+- [OpenAPI zod codegen](openapi-zod-codegen.md) — use `type: number` (never `integer`) in openapi.yaml; the orval zod client emits `zod.int()` which this zod version lacks.
+- [Orval schema naming conflicts](orval-naming.md) — naming an OpenAPI schema the same as operationId + "Body" causes a duplicate-export error; use a different name (e.g. ShareInput → ShareCreated, NOT CreateShareBody).
+- [Guard analysis OS gap](guard-analysis-os-gap.md) — Linux/Windows guard agent scripts are live but guard-analysis.ts still only parses macOS blobs; non-macOS ingest will fail hasMinimumTelemetry.

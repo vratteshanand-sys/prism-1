@@ -1,0 +1,1311 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: PRISM API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: supplychain
+    description: Supply chain dependency scanning
+  - name: sentinel
+    description: AI output safety analysis
+  - name: trustlens
+    description: Dark pattern and manipulation detection
+  - name: finguard
+    description: Financial transaction threat analysis
+  - name: dashboard
+    description: Cross-module summaries
+  - name: devicescan
+    description: Live device trust scanning
+  - name: guard
+    description: Hardware and network guard (Terminal agent)
+  - name: shares
+    description: Public shareable one-page scan summaries
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /supplychain/scans:
+    get:
+      operationId: listSupplyChainScans
+      tags: [supplychain]
+      summary: List supply chain scans
+      responses:
+        "200":
+          description: Scan history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SupplyChainScan"
+    post:
+      operationId: createSupplyChainScan
+      tags: [supplychain]
+      summary: Scan a dependency file for vulnerabilities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupplyChainScanInput"
+      responses:
+        "201":
+          description: Scan complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupplyChainScan"
+  /supplychain/scans/{id}:
+    get:
+      operationId: getSupplyChainScan
+      tags: [supplychain]
+      summary: Get one scan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: number }
+      responses:
+        "200":
+          description: Scan detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupplyChainScan"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteSupplyChainScan
+      tags: [supplychain]
+      summary: Delete a scan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: number }
+      responses:
+        "204":
+          description: Deleted
+  /sentinel/analyses:
+    get:
+      operationId: listSentinelAnalyses
+      tags: [sentinel]
+      summary: List AI output analyses
+      responses:
+        "200":
+          description: Analysis history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SentinelAnalysis"
+    post:
+      operationId: createSentinelAnalysis
+      tags: [sentinel]
+      summary: Analyze AI-generated text across 6 safety dimensions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SentinelAnalysisInput"
+      responses:
+        "201":
+          description: Analysis complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SentinelAnalysis"
+  /sentinel/analyses/{id}:
+    get:
+      operationId: getSentinelAnalysis
+      tags: [sentinel]
+      summary: Get one analysis
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: number }
+      responses:
+        "200":
+          description: Analysis detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SentinelAnalysis"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteSentinelAnalysis
+      tags: [sentinel]
+      summary: Delete an analysis
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: number }
+      responses:
+        "204":
+          description: Deleted
+  /trustlens/url-inspections:
+    get:
+      operationId: listUrlInspections
+      tags: [trustlens]
+      summary: List URL inspections
+      responses:
+        "200":
+          description: Inspection history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UrlInspection"
+    post:
+      operationId: createUrlInspection
+      tags: [trustlens]
+      summary: Inspect a URL for phishing and deception signals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UrlInspectionInput"
+      responses:
+        "201":
+          description: Inspection complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UrlInspection"
+  /trustlens/policy-analyses:
+    get:
+      operationId: listPolicyAnalyses
+      tags: [trustlens]
+      summary: List privacy policy analyses
+      responses:
+        "200":
+          description: Analysis history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PolicyAnalysis"
+    post:
+      operationId: createPolicyAnalysis
+      tags: [trustlens]
+      summary: Analyze a privacy policy for red flags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PolicyAnalysisInput"
+      responses:
+        "201":
+          description: Analysis complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PolicyAnalysis"
+  /trustlens/cookie-analyses:
+    get:
+      operationId: listCookieAnalyses
+      tags: [trustlens]
+      summary: List cookie banner analyses
+      responses:
+        "200":
+          description: Analysis history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CookieAnalysis"
+    post:
+      operationId: createCookieAnalysis
+      tags: [trustlens]
+      summary: Score a cookie consent banner for manipulation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CookieAnalysisInput"
+      responses:
+        "201":
+          description: Analysis complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookieAnalysis"
+  /trustlens/threat-intel:
+    get:
+      operationId: listThreatIntel
+      tags: [trustlens]
+      summary: List known dark pattern types
+      responses:
+        "200":
+          description: Dark pattern database
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ThreatIntelEntry"
+  /finguard/analyses:
+    get:
+      operationId: listFinguardAnalyses
+      tags: [finguard]
+      summary: List transaction analyses
+      responses:
+        "200":
+          description: Analysis history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FinguardAnalysis"
+    post:
+      operationId: createFinguardAnalysis
+      tags: [finguard]
+      summary: Analyze bank transfers / transactions for fraud signals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FinguardAnalysisInput"
+      responses:
+        "201":
+          description: Analysis complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinguardAnalysis"
+  /finguard/analyses/{id}:
+    get:
+      operationId: getFinguardAnalysis
+      tags: [finguard]
+      summary: Get one transaction analysis
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: number }
+      responses:
+        "200":
+          description: Analysis detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinguardAnalysis"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteFinguardAnalysis
+      tags: [finguard]
+      summary: Delete a transaction analysis
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: number }
+      responses:
+        "204":
+          description: Deleted
+  /devicescan/scans:
+    get:
+      operationId: listDeviceScans
+      tags: [devicescan]
+      summary: List device trust scans
+      responses:
+        "200":
+          description: Scan history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeviceScan"
+    post:
+      operationId: createDeviceScan
+      tags: [devicescan]
+      summary: Analyze live browser/device signals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviceScanInput"
+      responses:
+        "201":
+          description: Scan complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceScan"
+  /devicescan/scans/{id}:
+    get:
+      operationId: getDeviceScan
+      tags: [devicescan]
+      summary: Get one device scan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: number }
+      responses:
+        "200":
+          description: Scan detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceScan"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteDeviceScan
+      tags: [devicescan]
+      summary: Delete a device scan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: number }
+      responses:
+        "204":
+          description: Deleted
+  /devicescan/deep-scans:
+    get:
+      operationId: listDeepScans
+      tags: [devicescan]
+      summary: List deep (Terminal agent) scans
+      responses:
+        "200":
+          description: Deep scan history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeepScan"
+    post:
+      operationId: createDeepScan
+      tags: [devicescan]
+      summary: Start a deep scan (issues a pairing code + Terminal command)
+      responses:
+        "201":
+          description: Pending deep scan created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeepScan"
+  /devicescan/deep-scans/pending:
+    get:
+      operationId: getPendingDeepScan
+      tags: [devicescan]
+      summary: Return the session's current pending deep scan, if any
+      responses:
+        "200":
+          description: A pending deep scan exists for this session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeepScan"
+        "204":
+          description: No pending deep scan for this session
+  /devicescan/deep-scans/{id}:
+    get:
+      operationId: getDeepScan
+      tags: [devicescan]
+      summary: Poll one deep scan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: number }
+      responses:
+        "200":
+          description: Deep scan detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeepScan"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteDeepScan
+      tags: [devicescan]
+      summary: Delete a deep scan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: number }
+      responses:
+        "204":
+          description: Deleted
+  /devicescan/deep-ingest:
+    post:
+      operationId: ingestDeepScanResult
+      tags: [devicescan]
+      summary: Receive raw readings from the deep-scan Terminal agent (pairing-code auth)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeepScanIngestBody"
+      responses:
+        "200":
+          description: Accepted and analyzed
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok: { type: boolean }
+        "404":
+          description: Unknown or expired pairing code
+  /guard/scans:
+    get:
+      operationId: listGuardScans
+      tags: [guard]
+      summary: List hardware guard scans
+      responses:
+        "200":
+          description: Scan history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GuardScan"
+    post:
+      operationId: createGuardScan
+      tags: [guard]
+      summary: Start a guard scan (issues a pairing code + Terminal command)
+      responses:
+        "201":
+          description: Pending scan created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GuardScan"
+  /guard/scans/{id}:
+    get:
+      operationId: getGuardScan
+      tags: [guard]
+      summary: Poll one guard scan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: number }
+      responses:
+        "200":
+          description: Scan detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GuardScan"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteGuardScan
+      tags: [guard]
+      summary: Delete a guard scan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: number }
+      responses:
+        "204":
+          description: Deleted
+  /guard/ingest:
+    post:
+      operationId: ingestGuardResult
+      tags: [guard]
+      summary: Receive raw readings from the Terminal agent (pairing-code auth)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GuardIngestBody"
+      responses:
+        "200":
+          description: Accepted and analyzed
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok: { type: boolean }
+        "404":
+          description: Unknown or expired pairing code
+  /shares:
+    post:
+      operationId: createShare
+      tags: [shares]
+      summary: Create a public shareable one-page summary for a scan result
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShareInput"
+      responses:
+        "201":
+          description: Share created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShareCreated"
+  /shares/{token}:
+    get:
+      operationId: getShare
+      tags: [shares]
+      summary: Retrieve a public shareable scan summary (no auth required)
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Share data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShareData"
+        "404":
+          description: Share not found or expired
+  /guard/trust:
+    get:
+      operationId: listTrustedDevices
+      tags: [guard]
+      summary: List trusted device keys for the current session
+      responses:
+        "200":
+          description: Trusted devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrustedDevice"
+    post:
+      operationId: addTrustedDevice
+      tags: [guard]
+      summary: Mark a device key as trusted for the current session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddTrustBody"
+      responses:
+        "201":
+          description: Added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrustedDevice"
+  /guard/trust/{deviceKey}:
+    delete:
+      operationId: removeTrustedDevice
+      tags: [guard]
+      summary: Remove a device from the trusted list
+      parameters:
+        - name: deviceKey
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Removed
+  /guard/agent-linux.sh:
+    get:
+      operationId: getGuardLinuxScript
+      tags: [guard]
+      summary: Serve the Linux hardware/network guard agent bash script
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Shell script
+  /guard/agent-windows.ps1:
+    get:
+      operationId: getGuardWindowsScript
+      tags: [guard]
+      summary: Serve the Windows hardware/network guard agent PowerShell script
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: PowerShell script
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Cross-module dashboard summary
+      responses:
+        "200":
+          description: Summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    Finding:
+      type: object
+      required: [title, detail, severity]
+      properties:
+        title: { type: string }
+        detail: { type: string }
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+    Vulnerability:
+      type: object
+      required: [packageName, version, vulnId, severity, summary]
+      properties:
+        packageName: { type: string }
+        version: { type: string }
+        vulnId: { type: string }
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        summary: { type: string }
+        fixedVersion: { type: ["string", "null"] }
+    SupplyChainScan:
+      type: object
+      required:
+        [
+          id,
+          createdAt,
+          filename,
+          ecosystem,
+          totalDependencies,
+          vulnerableCount,
+          riskScore,
+          vulnerabilities,
+          aiSummary,
+        ]
+      properties:
+        id: { type: number }
+        createdAt: { type: string }
+        filename: { type: string }
+        ecosystem: { type: string }
+        totalDependencies: { type: number }
+        vulnerableCount: { type: number }
+        riskScore: { type: number }
+        vulnerabilities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Vulnerability"
+        dependencies:
+          type: array
+          items:
+            type: object
+            required: [name, version]
+            properties:
+              name: { type: string }
+              version: { type: string }
+        aiSummary: { type: string }
+    SupplyChainScanInput:
+      type: object
+      required: [filename, content]
+      properties:
+        filename: { type: string, minLength: 1 }
+        content: { type: string, minLength: 1 }
+    DimensionScores:
+      type: object
+      required: [safety, factuality, toxicity, bias, coherence, hallucinationRisk]
+      properties:
+        safety: { type: number }
+        factuality: { type: number }
+        toxicity: { type: number }
+        bias: { type: number }
+        coherence: { type: number }
+        hallucinationRisk: { type: number }
+    SentenceFlag:
+      type: object
+      required: [sentence, dimension, explanation, severity]
+      properties:
+        sentence: { type: string }
+        dimension: { type: string }
+        explanation: { type: string }
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+    SentinelAnalysis:
+      type: object
+      required:
+        [id, createdAt, textExcerpt, overallRisk, riskLevel, scores, flags, aiSummary]
+      properties:
+        id: { type: number }
+        createdAt: { type: string }
+        textExcerpt: { type: string }
+        overallRisk: { type: number }
+        riskLevel:
+          type: string
+          enum: [low, medium, high, critical]
+        scores:
+          $ref: "#/components/schemas/DimensionScores"
+        flags:
+          type: array
+          items:
+            $ref: "#/components/schemas/SentenceFlag"
+        aiSummary: { type: string }
+    SentinelAnalysisInput:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string, minLength: 1 }
+    UrlInspection:
+      type: object
+      required: [id, createdAt, url, verdict, riskScore, findings, aiSummary]
+      properties:
+        id: { type: number }
+        createdAt: { type: string }
+        url: { type: string }
+        verdict:
+          type: string
+          enum: [safe, suspicious, dangerous, critical]
+        riskScore: { type: number }
+        findings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Finding"
+        aiSummary: { type: string }
+    UrlInspectionInput:
+      type: object
+      required: [url]
+      properties:
+        url: { type: string, minLength: 1 }
+    PolicyAnalysis:
+      type: object
+      required:
+        [id, createdAt, excerpt, riskScore, redFlags, userRights, retention, aiSummary]
+      properties:
+        id: { type: number }
+        createdAt: { type: string }
+        excerpt: { type: string }
+        riskScore: { type: number }
+        redFlags:
+          type: array
+          items:
+            $ref: "#/components/schemas/Finding"
+        userRights:
+          type: array
+          items: { type: string }
+        retention: { type: string }
+        aiSummary: { type: string }
+    PolicyAnalysisInput:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string, minLength: 1 }
+    CookieAnalysis:
+      type: object
+      required: [id, createdAt, excerpt, manipulationScore, verdict, tactics, aiSummary]
+      properties:
+        id: { type: number }
+        createdAt: { type: string }
+        excerpt: { type: string }
+        manipulationScore: { type: number }
+        verdict:
+          type: string
+          enum: [fair, questionable, manipulative, deceptive]
+        tactics:
+          type: array
+          items:
+            $ref: "#/components/schemas/Finding"
+        aiSummary: { type: string }
+    CookieAnalysisInput:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string, minLength: 1 }
+    ThreatIntelEntry:
+      type: object
+      required: [id, name, category, severity, description, prevalence, platforms]
+      properties:
+        id: { type: number }
+        name: { type: string }
+        category: { type: string }
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        description: { type: string }
+        prevalence: { type: string }
+        platforms:
+          type: array
+          items: { type: string }
+    TransactionFlag:
+      type: object
+      required: [transaction, reason, severity]
+      properties:
+        transaction: { type: string }
+        reason: { type: string }
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+    FinguardAnalysis:
+      type: object
+      required:
+        [
+          id,
+          createdAt,
+          transactionCount,
+          flaggedCount,
+          riskScore,
+          flags,
+          aiSummary,
+        ]
+      properties:
+        id: { type: number }
+        createdAt: { type: string }
+        transactionCount: { type: number }
+        flaggedCount: { type: number }
+        riskScore: { type: number }
+        flags:
+          type: array
+          items:
+            $ref: "#/components/schemas/TransactionFlag"
+        aiSummary: { type: string }
+    FinguardAnalysisInput:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string, minLength: 1 }
+    PermissionState:
+      type: object
+      required: [name, state]
+      properties:
+        name: { type: string }
+        state: { type: string }
+    DeviceScanInput:
+      type: object
+      required: [userAgent]
+      properties:
+        userAgent: { type: string, minLength: 1 }
+        uaBrands: { type: string }
+        uaFullVersion: { type: string }
+        uaPlatform: { type: string }
+        uaPlatformVersion: { type: string }
+        uaArchitecture: { type: string }
+        uaModel: { type: string }
+        platform: { type: string }
+        vendor: { type: string }
+        languages:
+          type: array
+          items: { type: string }
+        timezone: { type: string }
+        screenWidth: { type: number }
+        screenHeight: { type: number }
+        colorDepth: { type: number }
+        pixelRatio: { type: number }
+        hardwareConcurrency: { type: ["number", "null"] }
+        deviceMemory: { type: ["number", "null"] }
+        touchPoints: { type: number }
+        cookiesEnabled: { type: boolean }
+        doNotTrack: { type: ["string", "null"] }
+        online: { type: boolean }
+        connectionType: { type: ["string", "null"] }
+        downlink: { type: ["number", "null"] }
+        rtt: { type: ["number", "null"] }
+        batteryLevel: { type: ["number", "null"] }
+        batteryCharging: { type: ["boolean", "null"] }
+        webglRenderer: { type: ["string", "null"] }
+        webglVendor: { type: ["string", "null"] }
+        canvasHash: { type: ["string", "null"] }
+        localStorageEnabled: { type: boolean }
+        pdfViewerEnabled: { type: boolean }
+        permissions:
+          type: array
+          items:
+            $ref: "#/components/schemas/PermissionState"
+    SignalReading:
+      type: object
+      required: [label, value, category]
+      properties:
+        label: { type: string }
+        value: { type: string }
+        category: { type: string }
+    DeviceScan:
+      type: object
+      required:
+        [
+          id,
+          createdAt,
+          deviceLabel,
+          browserName,
+          browserVersion,
+          osName,
+          browserUpToDate,
+          latestVersion,
+          trustScore,
+          riskScore,
+          fingerprintExposure,
+          findings,
+          signals,
+          aiSummary,
+        ]
+      properties:
+        id: { type: number }
+        createdAt: { type: string }
+        deviceLabel: { type: string }
+        browserName: { type: string }
+        browserVersion: { type: string }
+        osName: { type: string }
+        browserUpToDate: { type: ["boolean", "null"] }
+        latestVersion: { type: ["string", "null"] }
+        trustScore: { type: number }
+        riskScore: { type: number }
+        fingerprintExposure: { type: number }
+        findings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Finding"
+        signals:
+          type: array
+          items:
+            $ref: "#/components/schemas/SignalReading"
+        aiSummary: { type: string }
+    GuardSystem:
+      type: object
+      required: [cpuBrand, cpuCores, loadAvg1, cpuUsagePercent, memTotalGb, memUsedGb, memPressurePercent, gpuName, thermalPressure, batteryHealth, batteryCycleCount, uptime]
+      properties:
+        cpuBrand: { type: ["string", "null"] }
+        cpuCores: { type: ["number", "null"] }
+        loadAvg1: { type: ["number", "null"] }
+        cpuUsagePercent: { type: ["number", "null"] }
+        memTotalGb: { type: ["number", "null"] }
+        memUsedGb: { type: ["number", "null"] }
+        memPressurePercent: { type: ["number", "null"] }
+        gpuName: { type: ["string", "null"] }
+        thermalPressure: { type: ["string", "null"] }
+        batteryHealth: { type: ["string", "null"] }
+        batteryCycleCount: { type: ["number", "null"] }
+        uptime: { type: ["string", "null"] }
+    GuardDevice:
+      type: object
+      required: [name, vendor, kind, riskGrade, isNew, note]
+      properties:
+        name: { type: string }
+        vendor: { type: ["string", "null"] }
+        kind:
+          type: string
+          enum: [usb, thunderbolt, storage]
+        removable: { type: ["boolean", "null"] }
+        encrypted: { type: ["boolean", "null"] }
+        capacityGb: { type: ["number", "null"] }
+        riskGrade:
+          type: string
+          enum: [low, medium, high, critical]
+        isNew: { type: boolean }
+        note: { type: ["string", "null"] }
+    GuardNetwork:
+      type: object
+      required: [interfaceType, interfaceName, ssid, security, openNetwork, localDeviceCount]
+      properties:
+        interfaceType: { type: ["string", "null"] }
+        interfaceName: { type: ["string", "null"] }
+        ssid: { type: ["string", "null"] }
+        security: { type: ["string", "null"] }
+        openNetwork: { type: ["boolean", "null"] }
+        localDeviceCount: { type: ["number", "null"] }
+    GuardScan:
+      type: object
+      required:
+        [
+          id,
+          createdAt,
+          completedAt,
+          status,
+          pairingCode,
+          command,
+          machineLabel,
+          trustScore,
+          riskScore,
+          system,
+          devices,
+          network,
+          findings,
+          aiSummary,
+        ]
+      properties:
+        id: { type: number }
+        createdAt: { type: string }
+        completedAt: { type: ["string", "null"] }
+        status:
+          type: string
+          enum: [pending, complete, expired]
+        pairingCode: { type: string }
+        command: { type: string }
+        machineLabel: { type: ["string", "null"] }
+        trustScore: { type: ["number", "null"] }
+        riskScore: { type: ["number", "null"] }
+        system:
+          oneOf:
+            - $ref: "#/components/schemas/GuardSystem"
+            - type: "null"
+        devices:
+          type: array
+          items:
+            $ref: "#/components/schemas/GuardDevice"
+        network:
+          oneOf:
+            - $ref: "#/components/schemas/GuardNetwork"
+            - type: "null"
+        findings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Finding"
+        aiSummary: { type: ["string", "null"] }
+    ShareInput:
+      type: object
+      required: [module, title, riskScore, findings]
+      properties:
+        module: { type: string }
+        title: { type: string }
+        trustScore: { type: ["number", "null"] }
+        riskScore: { type: number }
+        aiSummary: { type: ["string", "null"] }
+        findings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Finding"
+        posture: {}
+    ShareCreated:
+      type: object
+      required: [token, shareUrl]
+      properties:
+        token: { type: string }
+        shareUrl: { type: string }
+    ShareData:
+      type: object
+      required: [token, module, title, riskScore, findings, createdAt]
+      properties:
+        token: { type: string }
+        module: { type: string }
+        title: { type: string }
+        trustScore: { type: ["number", "null"] }
+        riskScore: { type: number }
+        aiSummary: { type: ["string", "null"] }
+        findings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Finding"
+        posture: {}
+        createdAt: { type: string }
+    TrustedDevice:
+      type: object
+      required: [id, deviceKey, addedAt]
+      properties:
+        id: { type: number }
+        deviceKey: { type: string }
+        label: { type: ["string", "null"] }
+        addedAt: { type: string }
+    AddTrustBody:
+      type: object
+      required: [deviceKey]
+      properties:
+        deviceKey: { type: string }
+        label: { type: ["string", "null"] }
+    GuardIngestBody:
+      type: object
+      required: [pairingCode, raw]
+      properties:
+        pairingCode: { type: string, minLength: 4 }
+        os:
+          type: string
+          enum: [macos, linux, windows]
+          description: Operating system of the reporting machine (defaults to macos)
+        raw:
+          type: object
+          description: Base64-encoded raw command outputs collected by the agent.
+          properties:
+            hostname: { type: string }
+            sysctl: { type: string }
+            top: { type: string }
+            memoryPressure: { type: string }
+            thermal: { type: string }
+            spusb: { type: string }
+            spthunderbolt: { type: string }
+            spstorage: { type: string }
+            spdisplays: { type: string }
+            sppower: { type: string }
+            spairport: { type: string }
+            netif: { type: string }
+            arp: { type: string }
+            uptime: { type: string }
+    DeepScanPosture:
+      type: object
+      required:
+        [
+          macosVersion,
+          macosBuild,
+          latestMacos,
+          macosUpToDate,
+          fileVault,
+          firewall,
+          firewallStealth,
+          sip,
+          gatekeeper,
+          pendingUpdates,
+          diskUsedPercent,
+          diskAvailable,
+          uptime,
+        ]
+      properties:
+        macosVersion: { type: ["string", "null"] }
+        macosBuild: { type: ["string", "null"] }
+        latestMacos: { type: ["string", "null"] }
+        macosUpToDate: { type: ["boolean", "null"] }
+        fileVault: { type: ["boolean", "null"] }
+        firewall: { type: ["boolean", "null"] }
+        firewallStealth: { type: ["boolean", "null"] }
+        sip: { type: ["boolean", "null"] }
+        gatekeeper: { type: ["boolean", "null"] }
+        pendingUpdates:
+          type: array
+          items: { type: string }
+        diskUsedPercent: { type: ["number", "null"] }
+        diskAvailable: { type: ["string", "null"] }
+        uptime: { type: ["string", "null"] }
+    DeepScan:
+      type: object
+      required:
+        [
+          id,
+          createdAt,
+          completedAt,
+          status,
+          pairingCode,
+          command,
+          machineLabel,
+          trustScore,
+          riskScore,
+          posture,
+          findings,
+          aiSummary,
+        ]
+      properties:
+        id: { type: number }
+        createdAt: { type: string }
+        completedAt: { type: ["string", "null"] }
+        status:
+          type: string
+          enum: [pending, complete, expired]
+        pairingCode: { type: string }
+        command: { type: string }
+        machineLabel: { type: ["string", "null"] }
+        trustScore: { type: ["number", "null"] }
+        riskScore: { type: ["number", "null"] }
+        posture:
+          oneOf:
+            - $ref: "#/components/schemas/DeepScanPosture"
+            - type: "null"
+        findings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Finding"
+        aiSummary: { type: ["string", "null"] }
+    DeepScanIngestBody:
+      type: object
+      required: [pairingCode, raw]
+      properties:
+        pairingCode: { type: string, minLength: 4 }
+        raw:
+          type: object
+          description: Base64-encoded raw command outputs collected by the agent.
+          properties:
+            hostname: { type: string }
+            swVers: { type: string }
+            fdesetup: { type: string }
+            firewall: { type: string }
+            firewallStealth: { type: string }
+            spctl: { type: string }
+            csrutil: { type: string }
+            softwareupdate: { type: string }
+            df: { type: string }
+            uptime: { type: string }
+    ActivityItem:
+      type: object
+      required: [id, module, title, riskScore, createdAt]
+      properties:
+        id: { type: number }
+        module: { type: string }
+        title: { type: string }
+        riskScore: { type: number }
+        createdAt: { type: string }
+    DashboardSummary:
+      type: object
+      required:
+        [
+          supplyChainScans,
+          sentinelAnalyses,
+          trustlensScans,
+          finguardAnalyses,
+          deviceScans,
+          guardScans,
+          deepScans,
+          avgRiskScore,
+          highRiskCount,
+          recentActivity,
+        ]
+      properties:
+        supplyChainScans: { type: number }
+        sentinelAnalyses: { type: number }
+        trustlensScans: { type: number }
+        finguardAnalyses: { type: number }
+        deviceScans: { type: number }
+        guardScans: { type: number }
+        deepScans: { type: number }
+        avgRiskScore: { type: number }
+        highRiskCount: { type: number }
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityItem"

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "PRISM"
+description = "PRISM — 'Know it like you know you' — is a 4-in-1 digital trust and cybersecurity platform. It scans software dependency files for supply chain vulnerabilities, analyzes AI-generated text for safety/bias/hallucination risk, exposes dark patterns via URL inspection, privacy policy analysis and cookie banner decoding, and flags suspicious financial transactions for fraud signals. Built for both everyday users and enterprise security teams."
+version = "1.0.0"
+id = "artifacts/prism"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18618
+
+[services.development]
+run = "pnpm --filter @workspace/prism run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/prism", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/prism/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18618"
+BASE_PATH = "/"

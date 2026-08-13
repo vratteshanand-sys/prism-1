@@ -1,0 +1,87 @@
+# TrustLens — Full Brief
+
+---
+
+## What It Is
+
+**TrustLens** is a full-spectrum cybersecurity suite built to protect everyday users from digital manipulation. It uses AI to expose the tactics that websites, apps, and online services use to trick, pressure, or deceive people — before those tactics cost them money, privacy, or control.
+
+It's not an antivirus. It doesn't block threats. It **reveals** them — giving users the knowledge to make informed decisions about every interface they interact with.
+
+---
+
+## The Problem It Solves
+
+The modern internet is full of interfaces designed against the user:
+
+- Checkout pages engineered to extract more money than you intended to spend
+- Privacy policies deliberately written so you can't understand what you're agreeing to
+- Cookie banners designed so "Accept All" is the only easy path
+- Links that look legitimate but route to phishing pages
+- Subscription flows that are easy to start and nearly impossible to cancel
+
+These are called **dark patterns** — manipulative design techniques used by real companies. TrustLens names them, explains them, and gives users power back.
+
+---
+
+## The 6 Tools
+
+### 1. 🔲 UI Scanner
+Upload a screenshot of any website or app. The AI uses computer vision to detect manipulative design patterns — fake countdown timers, pre-checked upsells, hidden cancellation flows, misleading wording, pressure tactics, and more. Returns:
+- A **Trust Score** (0–100)
+- Categorized findings with severity (Low / Medium / High)
+- Plain-English explanations of each problem
+- A "transparent alternative" — what the interface would look like if it respected the user
+
+### 2. 🔗 URL Inspector
+Paste any link. The AI analyzes the URL structure (without visiting it) and flags:
+- Typosquatting (goog1e.com, paypa1.com)
+- Misleading subdomains (paypal.real-site.ru — the brand is in the subdomain, not the root)
+- Suspicious parameters, IP-based hostnames, unusual ports
+- Encoded/obfuscated characters and URL shorteners hiding destinations
+Returns a risk score from **Safe** to **Critical** with a full URL breakdown.
+
+### 3. 📄 Privacy Policy Analyzer
+Paste any privacy policy text. The AI reads the legal language and returns:
+- Whether your data is **shared, sold, or used for ads**
+- Whether the company can disclose data to **governments**
+- What your actual rights are (delete account, export data, opt-out)
+- How long your data is retained
+- Specific red flag clauses, plain-English concerns, and severity
+
+### 4. 🔘 Cookie Decoder
+Paste the text of any cookie consent banner. The AI scores the manipulation level and identifies specific tactics: asymmetric button design, missing "Reject All" buttons, pre-checked cookies, confirmshaming, and GDPR compliance signals. Returns a **manipulation score** from Fair to Deceptive.
+
+### 5. ⚡ Threat Intel
+A searchable, filterable database of 10 confirmed dark pattern types — each with a category, severity rating, description, affected platforms, prevalence, and a reference ID. Categories include: Roach Motel, Privacy Zuckering, Forced Continuity, Confirmshaming, Artificial Scarcity, Hidden Costs, Disguised Ads, Misdirection Cookie Banners, and more. Fully searchable and filterable by category and severity.
+
+### 6. 📊 My Reports
+A personal history of all UI scans run in the session — with scores, finding counts, timestamps, and the ability to revisit or delete any record.
+
+---
+
+## Who It's For
+
+| User | Why They Use It |
+|---|---|
+| **Everyday consumers** | Before signing up for a service, buying something online, or clicking a suspicious link |
+| **Privacy-conscious users** | Auditing what apps and sites actually do with their data |
+| **Researchers & journalists** | Documenting dark pattern usage for reports or investigations |
+| **UX designers** | Self-auditing their own interfaces for ethical compliance |
+| **Students** | Learning what manipulative design actually looks like in the wild |
+
+---
+
+## Tech Stack
+
+- **Frontend:** React + Vite, dark cybersecurity theme, sidebar navigation, Framer-ready animations
+- **Backend:** Node.js + Express API server
+- **AI:** OpenAI vision model (GPT) — no user API key required, powered by Replit's AI integration
+- **Database:** PostgreSQL (Drizzle ORM) — stores scan history per anonymous session
+- **Auth:** None (anonymous sessions via localStorage UUID) — no account needed to use any tool
+
+---
+
+## Design Philosophy
+
+TrustLens is built around one principle: **the user deserves to know what an interface is really asking them to do.** Every tool in the suite is educational, not punitive — findings use language like "potentially manipulative" or "may be unclear," never "this company is a scam." The goal is informed users, not false certainty.
