@@ -72,6 +72,12 @@ export default defineConfig({
     fs: {
       strict: true,
     },
+    // Local dev convenience: Replit routes /api to the api-server process at
+    // the platform level, which doesn't exist on a standalone dev machine.
+    // API_PROXY_TARGET opts into a local proxy without touching prod builds.
+    ...(process.env.API_PROXY_TARGET
+      ? { proxy: { '/api': { target: process.env.API_PROXY_TARGET, changeOrigin: true } } }
+      : {}),
   },
   preview: {
     port,
