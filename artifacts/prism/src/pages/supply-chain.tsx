@@ -64,12 +64,14 @@ function ScanCreator({ onSelect }: { onSelect: (id: number) => void }) {
   return (
     <div className="flex-1 overflow-y-auto bg-noise">
       <div className="p-8 max-w-6xl mx-auto space-y-8">
-        <div>
+        <div className="rise-in">
           <h1 className="text-3xl font-bold tracking-tight text-amber-600 dark:text-amber-400">Supply Chain DNA</h1>
           <p className="text-muted-foreground mt-2">Upload or paste dependency manifests (package.json, requirements.txt) to analyze vulnerability exposure.</p>
         </div>
 
-        <ModuleBanner theme={MODULES.supplychain} />
+        <div className="rise-in" style={{ animationDelay: "60ms" }}>
+          <ModuleBanner theme={MODULES.supplychain} />
+        </div>
         <Explainer label="What is a dependency manifest?">
           Modern software is built like a recipe: your app is the dish, and it pulls in
           dozens of ready-made ingredients (packages) listed in a file like{" "}
@@ -79,34 +81,35 @@ function ScanCreator({ onSelect }: { onSelect: (id: number) => void }) {
         </Explainer>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="glass-panel border-amber-500/30 shadow-lg shadow-amber-500/5 border-t-4 border-t-amber-500">
-            <CardHeader>
+          <Card className="glass-panel relative overflow-hidden hover-lift">
+            <div className="pointer-events-none absolute -top-10 -right-10 w-32 h-32 rounded-full bg-amber-500/10 blur-2xl" />
+            <CardHeader className="relative">
               <CardTitle className="flex items-center gap-2">
                 <FileCode className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 New Scan
               </CardTitle>
               <CardDescription>Paste your manifest file content here.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="relative space-y-4">
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Filename</label>
-                <Input 
-                  placeholder="e.g. package.json" 
-                  value={filename} 
-                  onChange={e => setFilename(e.target.value)} 
+                <Input
+                  placeholder="e.g. package.json"
+                  value={filename}
+                  onChange={e => setFilename(e.target.value)}
                 />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1.5 block">File Content</label>
-                <Textarea 
-                  placeholder='{\n  "dependencies": {\n    "express": "^4.17.1"\n  }\n}' 
+                <Textarea
+                  placeholder='{\n  "dependencies": {\n    "express": "^4.17.1"\n  }\n}'
                   className="font-mono text-xs min-h-[200px]"
                   value={content}
                   onChange={e => setContent(e.target.value)}
                 />
               </div>
-              <Button 
-                className="w-full font-bold tracking-wide" 
+              <Button
+                className="w-full font-bold tracking-wide press-scale"
                 size="lg"
                 disabled={!filename || !content || createScan.isPending}
                 onClick={handleScan}
@@ -143,9 +146,9 @@ function ScanCreator({ onSelect }: { onSelect: (id: number) => void }) {
                   </TableHeader>
                   <TableBody>
                     {history?.map((scan) => (
-                      <TableRow 
-                        key={scan.id} 
-                        className="cursor-pointer hover:bg-muted/50"
+                      <TableRow
+                        key={scan.id}
+                        className="cursor-pointer transition-colors duration-200 hover:bg-muted/50"
                         onClick={() => onSelect(scan.id)}
                       >
                         <TableCell className="font-medium truncate max-w-[150px]">{scan.filename}</TableCell>
@@ -206,15 +209,17 @@ function ScanDetail({ id, onBack }: { id: number, onBack: () => void }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="glass-panel">
-            <CardHeader className="pb-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 rise-in">
+          <Card className="glass-panel relative overflow-hidden hover-lift">
+            <div className="pointer-events-none absolute -top-8 -right-8 w-28 h-28 rounded-full bg-amber-500/10 blur-2xl" />
+            <CardHeader className="relative pb-2">
               <CardDescription>Total Dependencies</CardDescription>
               <CardTitle className="text-4xl font-mono">{scan.totalDependencies}</CardTitle>
             </CardHeader>
           </Card>
-          <Card className="glass-panel border-destructive/20">
-            <CardHeader className="pb-2">
+          <Card className="glass-panel relative overflow-hidden hover-lift border-destructive/20">
+            <div className="pointer-events-none absolute -top-8 -right-8 w-28 h-28 rounded-full bg-destructive/10 blur-2xl" />
+            <CardHeader className="relative pb-2">
               <CardDescription>Vulnerable Packages</CardDescription>
               <CardTitle className="text-4xl font-mono text-destructive">{scan.vulnerableCount}</CardTitle>
             </CardHeader>
@@ -242,8 +247,18 @@ function ScanDetail({ id, onBack }: { id: number, onBack: () => void }) {
           </Card>
         ) : (
           <div className="space-y-4">
-            {scan.vulnerabilities.map((v, i) => (
-              <Card key={i} className="glass-panel overflow-hidden border-l-4" style={{ borderLeftColor: v.severity === 'critical' || v.severity === 'high' ? 'hsl(var(--destructive))' : 'hsl(var(--primary))' }}>
+            {scan.vulnerabilities.map((v, i) => {
+              const isSevere = v.severity === 'critical' || v.severity === 'high';
+              return (
+              <Card
+                key={i}
+                className="glass-panel relative overflow-hidden hover-lift rise-in"
+                style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
+              >
+                <div
+                  className="pointer-events-none absolute top-0 left-0 w-1.5 h-full"
+                  style={{ background: isSevere ? 'hsl(var(--destructive))' : 'hsl(var(--primary))', opacity: 0.5 }}
+                />
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                     <div>
@@ -274,7 +289,8 @@ function ScanDetail({ id, onBack }: { id: number, onBack: () => void }) {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

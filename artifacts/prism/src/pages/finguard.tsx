@@ -62,12 +62,14 @@ function AnalysisCreator({ onSelect }: { onSelect: (id: number) => void }) {
   return (
     <div className="flex-1 overflow-y-auto bg-noise">
       <div className="p-8 max-w-6xl mx-auto space-y-8">
-        <div>
+        <div className="rise-in">
           <h1 className="text-3xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">FinGuard</h1>
           <p className="text-muted-foreground mt-2">Analyze bank transfers and transaction histories for fraud patterns and risk indicators.</p>
         </div>
 
-        <ModuleBanner theme={MODULES.finguard} />
+        <div className="rise-in" style={{ animationDelay: "60ms" }}>
+          <ModuleBanner theme={MODULES.finguard} />
+        </div>
         <Explainer label="What counts as a fraud pattern?">
           Fraud rarely announces itself. It shows up as patterns: many small
           withdrawals in a row (structuring), transfers to brand-new payees, odd
@@ -77,23 +79,24 @@ function AnalysisCreator({ onSelect }: { onSelect: (id: number) => void }) {
         </Explainer>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="glass-panel border-emerald-500/30 shadow-lg shadow-emerald-500/5 border-t-4 border-t-emerald-500">
-            <CardHeader>
+          <Card className="glass-panel relative overflow-hidden hover-lift">
+            <div className="pointer-events-none absolute -top-10 -right-10 w-32 h-32 rounded-full bg-emerald-500/10 blur-2xl" />
+            <CardHeader className="relative">
               <CardTitle className="flex items-center gap-2">
                 <FileSpreadsheet className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 New Ledger Scan
               </CardTitle>
               <CardDescription>Paste CSV data or plain text transaction records.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <Textarea 
-                placeholder="2023-10-01, Wire Transfer, -50000.00, Offshore LLC\n2023-10-02, ATM Withdrawal, -200.00, Local Branch\n..." 
+            <CardContent className="relative space-y-4">
+              <Textarea
+                placeholder="2023-10-01, Wire Transfer, -50000.00, Offshore LLC\n2023-10-02, ATM Withdrawal, -200.00, Local Branch\n..."
                 className="font-mono text-xs min-h-[300px]"
                 value={content}
                 onChange={e => setContent(e.target.value)}
               />
-              <Button 
-                className="w-full font-bold tracking-wide" 
+              <Button
+                className="w-full font-bold tracking-wide press-scale"
                 size="lg"
                 disabled={!content || createAnalysis.isPending}
                 onClick={handleAnalyze}
@@ -130,9 +133,9 @@ function AnalysisCreator({ onSelect }: { onSelect: (id: number) => void }) {
                   </TableHeader>
                   <TableBody>
                     {history?.map((item) => (
-                      <TableRow 
-                        key={item.id} 
-                        className="cursor-pointer hover:bg-muted/50"
+                      <TableRow
+                        key={item.id}
+                        className="cursor-pointer transition-colors duration-200 hover:bg-muted/50"
                         onClick={() => onSelect(item.id)}
                       >
                         <TableCell className="font-medium text-sm whitespace-nowrap">
@@ -192,15 +195,17 @@ function AnalysisDetail({ id, onBack }: { id: number, onBack: () => void }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="glass-panel">
-            <CardHeader className="pb-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 rise-in">
+          <Card className="glass-panel relative overflow-hidden hover-lift">
+            <div className="pointer-events-none absolute -top-8 -right-8 w-28 h-28 rounded-full bg-emerald-500/10 blur-2xl" />
+            <CardHeader className="relative pb-2">
               <CardDescription>Total Transactions</CardDescription>
               <CardTitle className="text-4xl font-mono">{analysis.transactionCount}</CardTitle>
             </CardHeader>
           </Card>
-          <Card className="glass-panel border-destructive/20">
-            <CardHeader className="pb-2">
+          <Card className="glass-panel relative overflow-hidden hover-lift border-destructive/20">
+            <div className="pointer-events-none absolute -top-8 -right-8 w-28 h-28 rounded-full bg-destructive/10 blur-2xl" />
+            <CardHeader className="relative pb-2">
               <CardDescription>Flagged Transactions</CardDescription>
               <CardTitle className="text-4xl font-mono text-destructive">{analysis.flaggedCount}</CardTitle>
             </CardHeader>
@@ -228,8 +233,18 @@ function AnalysisDetail({ id, onBack }: { id: number, onBack: () => void }) {
           </Card>
         ) : (
           <div className="space-y-3">
-            {analysis.flags.map((flag, i) => (
-              <div key={i} className="flex flex-col md:flex-row gap-4 p-5 rounded-lg border bg-background/50 glass-panel border-l-4" style={{ borderLeftColor: flag.severity === 'critical' || flag.severity === 'high' ? 'hsl(var(--destructive))' : 'hsl(var(--primary))' }}>
+            {analysis.flags.map((flag, i) => {
+              const isSevere = flag.severity === 'critical' || flag.severity === 'high';
+              return (
+              <div
+                key={i}
+                className="relative flex flex-col md:flex-row gap-4 p-5 rounded-lg border bg-background/50 glass-panel overflow-hidden hover-lift rise-in"
+                style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
+              >
+                <div
+                  className="pointer-events-none absolute top-0 left-0 w-1.5 h-full"
+                  style={{ background: isSevere ? 'hsl(var(--destructive))' : 'hsl(var(--primary))', opacity: 0.5 }}
+                />
                 <div className="md:w-1/4 shrink-0 space-y-2">
                   <Badge variant={flag.severity === 'critical' || flag.severity === 'high' ? 'critical' : 'warning'} className="uppercase">
                     {flag.severity}
@@ -249,7 +264,8 @@ function AnalysisDetail({ id, onBack }: { id: number, onBack: () => void }) {
                   />
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

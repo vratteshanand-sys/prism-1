@@ -63,12 +63,14 @@ function AnalysisCreator({ onSelect }: { onSelect: (id: number) => void }) {
   return (
     <div className="flex-1 overflow-y-auto bg-noise">
       <div className="p-8 max-w-6xl mx-auto space-y-8">
-        <div>
+        <div className="rise-in">
           <h1 className="text-3xl font-bold tracking-tight text-violet-600 dark:text-violet-400">Sentinel AI</h1>
           <p className="text-muted-foreground mt-2">Analyze AI-generated content across 6 dimensions of safety, bias, and factuality.</p>
         </div>
 
-        <ModuleBanner theme={MODULES.sentinel} />
+        <div className="rise-in" style={{ animationDelay: "60ms" }}>
+          <ModuleBanner theme={MODULES.sentinel} />
+        </div>
         <Explainer label="Why analyze AI text at all?">
           AI writing tools sound confident even when they are wrong, biased, or unsafe.
           Sentinel reads the text like a skeptical editor: it grades six separate
@@ -77,23 +79,24 @@ function AnalysisCreator({ onSelect }: { onSelect: (id: number) => void }) {
         </Explainer>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="glass-panel shadow-lg border-violet-500/30 border-t-4 border-t-violet-500">
-            <CardHeader>
+          <Card className="glass-panel relative overflow-hidden hover-lift">
+            <div className="pointer-events-none absolute -top-10 -right-10 w-32 h-32 rounded-full bg-violet-500/10 blur-2xl" />
+            <CardHeader className="relative">
               <CardTitle className="flex items-center gap-2">
                 <Bot className="w-5 h-5 text-violet-600 dark:text-violet-400" />
                 New Analysis
               </CardTitle>
               <CardDescription>Paste LLM output or generated text here.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <Textarea 
-                placeholder="Paste generated text to analyze..." 
+            <CardContent className="relative space-y-4">
+              <Textarea
+                placeholder="Paste generated text to analyze..."
                 className="min-h-[300px] text-base leading-relaxed"
                 value={text}
                 onChange={e => setText(e.target.value)}
               />
-              <Button 
-                className="w-full font-bold tracking-wide" 
+              <Button
+                className="w-full font-bold tracking-wide press-scale"
                 size="lg"
                 disabled={!text || createAnalysis.isPending}
                 onClick={handleAnalyze}
@@ -129,9 +132,9 @@ function AnalysisCreator({ onSelect }: { onSelect: (id: number) => void }) {
                   </TableHeader>
                   <TableBody>
                     {history?.map((item) => (
-                      <TableRow 
-                        key={item.id} 
-                        className="cursor-pointer hover:bg-muted/50"
+                      <TableRow
+                        key={item.id}
+                        className="cursor-pointer transition-colors duration-200 hover:bg-muted/50"
                         onClick={() => onSelect(item.id)}
                       >
                         <TableCell className="font-medium text-sm truncate max-w-[200px] italic text-muted-foreground">
@@ -243,7 +246,11 @@ function AnalysisDetail({ id, onBack }: { id: number, onBack: () => void }) {
         ) : (
           <div className="space-y-4">
             {analysis.flags.map((flag, i) => (
-              <div key={i} className="flex flex-col md:flex-row gap-4 p-5 rounded-lg border bg-background/50 glass-panel">
+              <div
+                key={i}
+                className="flex flex-col md:flex-row gap-4 p-5 rounded-lg border bg-background/50 glass-panel hover-lift rise-in"
+                style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
+              >
                 <div className="md:w-1/4 shrink-0 space-y-2">
                   <Badge variant="outline" className="uppercase font-mono text-[0.65rem] tracking-wider">{flag.dimension}</Badge>
                   <div>
