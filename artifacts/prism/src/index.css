@@ -322,10 +322,32 @@
 }
 .glow-breathe { animation: glow-breathe 6s ease-in-out infinite; }
 
+/* Shimmer skeleton — a moving highlight band instead of a flat opacity pulse */
+@keyframes shimmer-sweep {
+  from { background-position: -150% 0; }
+  to   { background-position: 150% 0; }
+}
+.skeleton-shimmer {
+  background-color: hsl(var(--muted));
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--muted-foreground) / 0.14),
+    transparent
+  );
+  background-size: 60% 100%;
+  background-repeat: no-repeat;
+  animation: shimmer-sweep 1.6s ease-in-out infinite;
+}
+
+/* Route transition — brief fade+rise on every navigation */
+.route-transition { animation: rise-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
 @media (prefers-reduced-motion: reduce) {
   .score-ring-arc, .rise-in, .hover-lift, .press-scale, .tab-fade-in, .value-tick,
   .nav-indicator-active, .icon-pop-in, .icon-wiggle, .spotlight-sweep,
-  .prism-float, .beam-pulse, .rainbow-band, .sparkle-twinkle, .glow-breathe {
+  .prism-float, .beam-pulse, .rainbow-band, .sparkle-twinkle, .glow-breathe,
+  .skeleton-shimmer, .route-transition {
     animation: none !important;
     transition: none !important;
   }

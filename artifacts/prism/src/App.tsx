@@ -57,7 +57,13 @@ function Router() {
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   const [location] = useLocation();
-  return <ErrorBoundary resetKey={location}>{children}</ErrorBoundary>;
+  return (
+    <ErrorBoundary resetKey={location}>
+      <div key={location} className="route-transition flex-1 min-w-0 flex flex-col">
+        {children}
+      </div>
+    </ErrorBoundary>
+  );
 }
 
 function App() {
