@@ -89,43 +89,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
             const isActive = location === item.href;
             const Icon = item.icon;
             return (
-              <WouterLink key={item.name} href={item.href} className="block">
+              <WouterLink key={item.name} href={item.href} className="block group/nav">
                 <div
                   className={cn(
-                    "flex items-center gap-2.5 px-2.5 py-2 rounded text-sm transition-all",
-                    isActive
-                      ? "font-medium"
-                      : "font-normal",
+                    "relative flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm transition-all duration-200",
+                    isActive ? "font-medium" : "font-normal hover:bg-white/[0.06] hover:translate-x-0.5",
                   )}
-                  style={
-                    isActive
-                      ? {
-                          background: "hsl(var(--sidebar-accent))",
-                          color: "hsl(var(--sidebar-accent-foreground))",
-                        }
-                      : {
-                          color: "hsl(var(--sidebar-foreground))",
-                        }
-                  }
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      (e.currentTarget as HTMLElement).style.background = "hsl(var(--sidebar-accent))";
-                      (e.currentTarget as HTMLElement).style.color = "hsl(var(--sidebar-accent-foreground))";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      (e.currentTarget as HTMLElement).style.background = "";
-                      (e.currentTarget as HTMLElement).style.color = "hsl(var(--sidebar-foreground))";
-                    }
+                  style={{
+                    background: isActive ? "hsl(var(--sidebar-accent))" : "transparent",
+                    color: isActive ? "hsl(var(--sidebar-accent-foreground))" : "hsl(var(--sidebar-foreground))",
                   }}
                 >
                   {/* Module color indicator strip */}
                   <span
-                    className="w-0.5 h-4 rounded-full shrink-0"
-                    style={{ background: isActive ? item.hsl : "transparent" }}
+                    className={cn("w-0.5 h-4 rounded-full shrink-0", isActive && "nav-indicator-active")}
+                    style={{ background: isActive ? item.hsl : "transparent", transformOrigin: "center" }}
                   />
-                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  <Icon className="w-3.5 h-3.5 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
                   <span className="truncate">{item.name}</span>
                   {isActive && (
                     <ChevronRight className="w-3 h-3 ml-auto shrink-0 opacity-50" />
@@ -140,20 +120,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="px-3 pb-4 border-t" style={{ borderColor: "hsl(var(--sidebar-border))", paddingTop: "12px" }}>
           <button
             onClick={() => setDark((d) => !d)}
-            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded text-sm transition-all"
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm transition-all duration-200 hover:bg-white/[0.06] press-scale group/toggle"
             style={{ color: "hsl(var(--sidebar-foreground))" }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "hsl(var(--sidebar-accent))";
-              (e.currentTarget as HTMLElement).style.color = "hsl(var(--sidebar-accent-foreground))";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "";
-              (e.currentTarget as HTMLElement).style.color = "hsl(var(--sidebar-foreground))";
-            }}
             aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
           >
             <span className="w-0.5 h-4 rounded-full shrink-0" />
-            {dark ? <Sun className="w-3.5 h-3.5 shrink-0" /> : <Moon className="w-3.5 h-3.5 shrink-0" />}
+            <span className="transition-transform duration-300 group-hover/toggle:rotate-12">
+              {dark ? <Sun className="w-3.5 h-3.5 shrink-0" /> : <Moon className="w-3.5 h-3.5 shrink-0" />}
+            </span>
             {dark ? "Light mode" : "Dark mode"}
           </button>
         </div>

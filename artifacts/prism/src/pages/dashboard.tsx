@@ -8,6 +8,11 @@ import { MODULES, themeForLabel } from "@/lib/modules";
 import { ScoreRing } from "@/components/score-ring";
 import { Explainer, GuidedTour } from "@/components/teachy";
 import { cn } from "@/lib/utils";
+import { useCountUp } from "@/hooks/use-count-up";
+
+function StatValue({ value }: { value: number }) {
+  return <>{useCountUp(value)}</>;
+}
 
 export default function Dashboard() {
   const { data: summary, isLoading } = useGetDashboardSummary({ query: { queryKey: getGetDashboardSummaryQueryKey() } });
@@ -60,8 +65,8 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center gap-4 shrink-0">
             <div className="text-right">
-              <div className={cn("text-2xl font-mono font-bold", riskLevel.color)}>
-                {summary.avgRiskScore}
+              <div className={cn("text-2xl font-mono font-bold tabular-nums", riskLevel.color)}>
+                <StatValue value={summary.avgRiskScore} />
                 <span className="text-sm font-normal text-muted-foreground">/100</span>
               </div>
               <div className="text-xs text-muted-foreground">
@@ -87,18 +92,30 @@ export default function Dashboard() {
             return (
               <Link key={m.theme.name} href={m.theme.href} className="block group">
                 <div
-                  className="border rounded bg-card p-4 transition-all hover:shadow-md hover:border-current rise-in cursor-pointer"
-                  style={{ animationDelay: `${i * 50}ms`, borderLeftColor: m.theme.hsl, borderLeftWidth: "3px" }}
+                  className="relative overflow-hidden rounded-xl border bg-card p-4 hover-lift press-scale rise-in cursor-pointer"
+                  style={{ animationDelay: `${i * 50}ms` }}
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <Icon className="w-4 h-4" style={{ color: m.theme.hsl }} />
-                    <ArrowUpRight className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {/* Tinted radial wash — module identity without a slapped-on border stripe */}
+                  <div
+                    className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-[0.12] blur-xl transition-opacity duration-300 group-hover:opacity-25"
+                    style={{ background: m.theme.hsl }}
+                  />
+                  <div className="relative flex items-center justify-between mb-3">
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+                      style={{ background: `color-mix(in srgb, ${m.theme.hsl} 14%, transparent)` }}
+                    >
+                      <Icon className="w-4 h-4" style={{ color: m.theme.hsl }} />
+                    </div>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                   </div>
-                  <div className="text-xl font-mono font-bold tabular-nums">{m.value}</div>
-                  <div className="text-sm font-medium mt-0.5" style={{ color: m.theme.hsl }}>
+                  <div className="relative text-2xl font-mono font-bold tabular-nums">
+                    <StatValue value={m.value} />
+                  </div>
+                  <div className="relative text-sm font-medium mt-0.5" style={{ color: m.theme.hsl }}>
                     {m.theme.name}
                   </div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{m.desc}</div>
+                  <div className="relative text-xs text-muted-foreground mt-0.5">{m.desc}</div>
                 </div>
               </Link>
             );
@@ -125,17 +142,22 @@ export default function Dashboard() {
                     <p className="text-xs mt-1">Pick any module and run your first scan.</p>
                   </div>
                 ) : (
-                  summary.recentActivity.map((act) => {
+                  summary.recentActivity.map((act, i) => {
                     const theme = themeForLabel(act.module);
                     const Icon = theme.icon;
                     return (
                       <div
                         key={`${act.module}-${act.id}-${act.createdAt}-${act.title}`}
-                        className="flex items-center justify-between px-3 py-2.5 rounded border bg-background/50"
-                        style={{ borderLeft: `2px solid ${theme.hsl}` }}
+                        className="flex items-center justify-between px-3 py-2.5 rounded-lg border bg-background/50 transition-all duration-200 hover:bg-background hover:border-current hover:translate-x-0.5 rise-in"
+                        style={{ animationDelay: `${i * 40}ms` }}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: theme.hsl }} />
+                          <div
+                            className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
+                            style={{ background: `color-mix(in srgb, ${theme.hsl} 14%, transparent)` }}
+                          >
+                            <Icon className="w-3.5 h-3.5" style={{ color: theme.hsl }} />
+                          </div>
                           <div className="min-w-0">
                             <div className="text-sm font-medium truncate max-w-[18rem]" title={act.title}>
                               {act.title}
@@ -157,7 +179,13 @@ export default function Dashboard() {
           </Card>
 
           {/* Critical Attention */}
-          <Card className="border-red-200/60 dark:border-red-900/40">
+          <Card className={cn(
+            "relative overflow-hidden transition-colors duration-300",
+            summary.highRiskCount > 0 ? "border-red-200/60 dark:border-red-900/40" : "border-emerald-200/60 dark:border-emerald-900/40",
+          )}>
+            {summary.highRiskCount > 0 && (
+              <div className="pointer-events-none absolute -top-10 -right-10 w-40 h-40 rounded-full bg-red-500/10 blur-2xl" />
+            )}
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-red-500" />
@@ -165,14 +193,14 @@ export default function Dashboard() {
               </div>
               <CardDescription className="text-xs">High-risk findings needing review</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center py-6 gap-3">
+            <CardContent className="relative flex flex-col items-center justify-center py-6 gap-3">
               <div
                 className={cn(
                   "text-6xl font-mono font-bold tabular-nums",
                   summary.highRiskCount > 0 ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400",
                 )}
               >
-                {summary.highRiskCount}
+                <StatValue value={summary.highRiskCount} />
               </div>
               <p className="text-xs text-muted-foreground text-center leading-relaxed max-w-[160px]">
                 {summary.highRiskCount === 0
