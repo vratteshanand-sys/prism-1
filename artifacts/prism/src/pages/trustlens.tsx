@@ -19,6 +19,11 @@ import { useToast } from "@/hooks/use-toast";
 import { MODULES } from "@/lib/modules";
 import { ModuleBanner, Explainer } from "@/components/teachy";
 import { ShareButton } from "@/components/share-button";
+import { useCountUp } from "@/hooks/use-count-up";
+
+function StatValue({ value }: { value: number }) {
+  return <>{useCountUp(value)}</>;
+}
 
 /** Regulation citation chip — shown on findings that map to a specific compliance clause */
 function RegulationTag({ regulation }: { regulation?: string | null }) {
@@ -34,12 +39,14 @@ export default function TrustLens() {
   return (
     <div className="flex-1 overflow-y-auto bg-noise">
       <div className="p-8 max-w-7xl mx-auto space-y-8">
-        <div>
+        <div className="rise-in">
           <h1 className="text-3xl font-bold tracking-tight text-cyan-600 dark:text-cyan-400">TrustLens Compliance Audit</h1>
           <p className="text-muted-foreground mt-2">Automated GDPR, CCPA, and dark-pattern compliance screening for URLs, privacy policies, and cookie consent flows — with regulation citations and exportable audit reports.</p>
         </div>
 
-        <ModuleBanner theme={MODULES.trustlens} />
+        <div className="rise-in" style={{ animationDelay: "60ms" }}>
+          <ModuleBanner theme={MODULES.trustlens} />
+        </div>
         <Explainer label="What does a compliance screen check?">
           TrustLens screens URLs, privacy policies, and cookie consent banners against
           patterns regulators flag under GDPR, CCPA, and the EU's dark-pattern rules —
@@ -51,37 +58,37 @@ export default function TrustLens() {
 
         <Tabs defaultValue="url" className="w-full">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto md:h-14 bg-muted/50 p-1 rounded-xl gap-1">
-            <TabsTrigger value="url" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2">
+            <TabsTrigger value="url" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2 transition-all duration-200">
               <LinkIcon className="w-4 h-4" /> URL Screen
             </TabsTrigger>
-            <TabsTrigger value="policy" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2">
+            <TabsTrigger value="policy" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2 transition-all duration-200">
               <FileText className="w-4 h-4" /> Policy Review
             </TabsTrigger>
-            <TabsTrigger value="cookie" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2">
+            <TabsTrigger value="cookie" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2 transition-all duration-200">
               <Cookie className="w-4 h-4" /> Consent Check
             </TabsTrigger>
-            <TabsTrigger value="trail" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2">
+            <TabsTrigger value="trail" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2 transition-all duration-200">
               <ClipboardList className="w-4 h-4" /> Audit Trail
             </TabsTrigger>
-            <TabsTrigger value="threat" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2">
+            <TabsTrigger value="threat" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm text-sm font-medium h-full gap-2 transition-all duration-200">
               <AlertTriangle className="w-4 h-4" /> Threat Intel
             </TabsTrigger>
           </TabsList>
 
           <div className="mt-8">
-            <TabsContent value="url">
+            <TabsContent value="url" className="tab-fade-in">
               <UrlInspector />
             </TabsContent>
-            <TabsContent value="policy">
+            <TabsContent value="policy" className="tab-fade-in">
               <PolicyAnalyzer />
             </TabsContent>
-            <TabsContent value="cookie">
+            <TabsContent value="cookie" className="tab-fade-in">
               <CookieDecoder />
             </TabsContent>
-            <TabsContent value="trail">
+            <TabsContent value="trail" className="tab-fade-in">
               <AuditTrail />
             </TabsContent>
-            <TabsContent value="threat">
+            <TabsContent value="threat" className="tab-fade-in">
               <ThreatIntel />
             </TabsContent>
           </div>
@@ -441,22 +448,27 @@ function AuditTrail() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="glass-panel"><CardContent className="p-4">
-          <div className="text-xs uppercase text-muted-foreground font-bold">Total Screens</div>
-          <div className="text-2xl font-mono font-bold mt-1">{rows.length}</div>
-        </CardContent></Card>
-        <Card className="glass-panel"><CardContent className="p-4">
-          <div className="text-xs uppercase text-muted-foreground font-bold">Regulation Citations</div>
-          <div className="text-2xl font-mono font-bold mt-1 text-cyan-600 dark:text-cyan-400">{totalRegulationCitations}</div>
-        </CardContent></Card>
-        <Card className="glass-panel"><CardContent className="p-4">
-          <div className="text-xs uppercase text-muted-foreground font-bold">URL Screens</div>
-          <div className="text-2xl font-mono font-bold mt-1">{urls?.length ?? 0}</div>
-        </CardContent></Card>
-        <Card className="glass-panel"><CardContent className="p-4">
-          <div className="text-xs uppercase text-muted-foreground font-bold">Policy + Consent Reviews</div>
-          <div className="text-2xl font-mono font-bold mt-1">{(policies?.length ?? 0) + (cookies?.length ?? 0)}</div>
-        </CardContent></Card>
+        {[
+          { label: "Total Screens", value: rows.length, hsl: MODULES.trustlens.hsl },
+          { label: "Regulation Citations", value: totalRegulationCitations, hsl: "hsl(189 70% 40%)" },
+          { label: "URL Screens", value: urls?.length ?? 0, hsl: MODULES.supplychain.hsl },
+          { label: "Policy + Consent Reviews", value: (policies?.length ?? 0) + (cookies?.length ?? 0), hsl: MODULES.finguard.hsl },
+        ].map((stat, i) => (
+          <div
+            key={stat.label}
+            className="relative overflow-hidden rounded-xl border bg-card p-4 hover-lift rise-in"
+            style={{ animationDelay: `${i * 50}ms` }}
+          >
+            <div
+              className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-[0.1] blur-xl"
+              style={{ background: stat.hsl }}
+            />
+            <div className="relative text-xs uppercase text-muted-foreground font-bold tracking-wide">{stat.label}</div>
+            <div className="relative text-2xl font-mono font-bold mt-1 tabular-nums" style={{ color: stat.hsl }}>
+              <StatValue value={stat.value} />
+            </div>
+          </div>
+        ))}
       </div>
 
       <Card className="glass-panel">
