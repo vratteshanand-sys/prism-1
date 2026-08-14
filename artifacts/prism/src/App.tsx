@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import { Layout } from '@/components/layout';
+import { OnboardingGate } from '@/components/onboarding';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
 import Dashboard from '@/pages/dashboard';
@@ -32,21 +33,23 @@ function Router() {
       {/* Public share page — no sidebar/layout */}
       <Route path="/share/:token" component={SharePage} />
       <Route>
-        <Layout>
-          <RoutedErrorBoundary>
-            <Switch>
-              <Route path="/" component={Dashboard} />
-              <Route path="/supplychain" component={SupplyChain} />
-              <Route path="/sentinel" component={Sentinel} />
-              <Route path="/trustlens" component={TrustLens} />
-              <Route path="/finguard" component={FinGuard} />
-              <Route path="/devicescan" component={DeviceScanPage} />
-              <Route path="/guard" component={GuardPage} />
-              <Route path="/reports" component={Reports} />
-              <Route component={NotFound} />
-            </Switch>
-          </RoutedErrorBoundary>
-        </Layout>
+        <OnboardingGate>
+          <Layout>
+            <RoutedErrorBoundary>
+              <Switch>
+                <Route path="/" component={Dashboard} />
+                <Route path="/supplychain" component={SupplyChain} />
+                <Route path="/sentinel" component={Sentinel} />
+                <Route path="/trustlens" component={TrustLens} />
+                <Route path="/finguard" component={FinGuard} />
+                <Route path="/devicescan" component={DeviceScanPage} />
+                <Route path="/guard" component={GuardPage} />
+                <Route path="/reports" component={Reports} />
+                <Route component={NotFound} />
+              </Switch>
+            </RoutedErrorBoundary>
+          </Layout>
+        </OnboardingGate>
       </Route>
     </Switch>
   );
