@@ -337,8 +337,9 @@ function DeepScanSection() {
   };
 
   return (
-    <Card className="glass-panel border-blue-500/30 border-t-4 border-t-blue-500">
-      <CardHeader>
+    <Card className="glass-panel relative overflow-hidden border-blue-500/30">
+      <div className="pointer-events-none absolute -top-10 -right-10 w-32 h-32 rounded-full bg-blue-500/10 blur-2xl" />
+      <CardHeader className="relative">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <CardTitle className="flex items-center gap-2">
@@ -516,12 +517,13 @@ function DeepScanResult({ scan }: { scan: DeepScan }) {
   const p = scan.posture;
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="glass-panel border-t-4 border-t-blue-500">
-          <CardHeader className="pb-2 items-center">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 rise-in">
+        <Card className="glass-panel relative overflow-hidden hover-lift">
+          <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl" />
+          <CardHeader className="relative pb-2 items-center">
             <CardDescription>Deep Scan Trust Score</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col items-center gap-2">
+          <CardContent className="relative flex flex-col items-center gap-2">
             <ScoreRing score={scan.trustScore ?? 0} invert size={110} />
             <div className="text-sm text-muted-foreground text-center">
               {scan.machineLabel ?? "Mac"}
@@ -684,12 +686,13 @@ function ScanResult({ scan }: { scan: DeviceScan }) {
   const categories = [...new Set(scan.signals.map((s) => s.category))];
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="glass-panel border-t-4 border-t-blue-500">
-          <CardHeader className="pb-2 items-center">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 rise-in">
+        <Card className="glass-panel relative overflow-hidden hover-lift">
+          <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl" />
+          <CardHeader className="relative pb-2 items-center">
             <CardDescription>Device Trust Score</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col items-center gap-2">
+          <CardContent className="relative flex flex-col items-center gap-2">
             <ScoreRing score={scan.trustScore} invert size={110} />
             <div className="text-sm text-muted-foreground text-center">{scan.deviceLabel}</div>
             <Explainer label="What does this mean?">
@@ -699,15 +702,16 @@ function ScanResult({ scan }: { scan: DeviceScan }) {
             </Explainer>
           </CardContent>
         </Card>
-        <Card className="glass-panel border-t-4 border-t-blue-500">
-          <CardHeader className="pb-2">
+        <Card className="glass-panel relative overflow-hidden hover-lift">
+          <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl" />
+          <CardHeader className="relative pb-2">
             <CardDescription>Fingerprinting Exposure</CardDescription>
             <CardTitle className={`text-5xl font-mono ${getRiskColor(scan.fingerprintExposure)}`}>
               {scan.fingerprintExposure}
               <span className="text-lg text-muted-foreground">/100</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative">
             <div className="h-2 rounded-full bg-muted overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 transition-all duration-1000"

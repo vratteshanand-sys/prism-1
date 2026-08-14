@@ -142,7 +142,7 @@ export default function GuardPage() {
   return (
     <div className="flex-1 overflow-y-auto bg-noise">
       <div className="p-8 max-w-6xl mx-auto space-y-8">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex items-start justify-between gap-4 flex-wrap rise-in">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-orange-600 dark:text-orange-400">
               Hardware & Network Guard
@@ -156,13 +156,16 @@ export default function GuardPage() {
           <Button
             onClick={startScan}
             disabled={createScan.isPending || pendingId != null}
+            className="press-scale"
           >
             <Terminal className="w-4 h-4 mr-2" />
             {history?.length ? "New Guard scan" : "Start Guard scan"}
           </Button>
         </div>
 
-        <ModuleBanner theme={MODULES.guard} />
+        <div className="rise-in" style={{ animationDelay: "60ms" }}>
+          <ModuleBanner theme={MODULES.guard} />
+        </div>
 
         <div className="flex items-start gap-3 p-4 rounded-lg border border-orange-500/20 bg-orange-500/5 text-sm">
           <ShieldQuestion className="w-4 h-4 mt-0.5 text-orange-600 dark:text-orange-400 shrink-0" />
@@ -180,7 +183,8 @@ export default function GuardPage() {
         </div>
 
         {pending && (
-          <Card className="glass-panel border-orange-500/30 border-t-4 border-t-orange-500">
+          <Card className="glass-panel relative overflow-hidden border-orange-500/30 rise-in">
+            <div className="pointer-events-none absolute -top-10 -right-10 w-32 h-32 rounded-full bg-orange-500/10 blur-2xl" />
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Terminal className="w-5 h-5 text-orange-600 dark:text-orange-400" />
@@ -268,10 +272,11 @@ export default function GuardPage() {
                 No Guard scans yet — start one above.
               </div>
             )}
-            {history?.map((s) => (
+            {history?.map((s, i) => (
               <div
                 key={s.id}
-                className="flex items-center justify-between p-3 rounded-md border bg-background/50 cursor-pointer hover:bg-muted/50 transition-colors"
+                className="flex items-center justify-between p-3 rounded-md border bg-background/50 cursor-pointer hover:bg-muted/50 transition-all duration-200 hover:translate-x-0.5 rise-in"
+                style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
                 onClick={() => setResult(s)}
               >
                 <div>
@@ -341,8 +346,9 @@ function StatCard({
   sub?: string | null;
 }) {
   return (
-    <Card className="glass-panel border-t-4 border-t-orange-500">
-      <CardHeader className="pb-2">
+    <Card className="glass-panel relative overflow-hidden hover-lift">
+      <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full bg-orange-500/10 blur-2xl" />
+      <CardHeader className="relative pb-2">
         <CardDescription className="flex items-center gap-2">
           <Icon className="w-4 h-4 text-orange-600 dark:text-orange-400" />
           {label}
@@ -350,7 +356,7 @@ function StatCard({
         <CardTitle className="text-2xl font-mono">{value}</CardTitle>
       </CardHeader>
       {sub && (
-        <CardContent className="text-xs text-muted-foreground pt-0">{sub}</CardContent>
+        <CardContent className="relative text-xs text-muted-foreground pt-0">{sub}</CardContent>
       )}
     </Card>
   );
@@ -393,12 +399,13 @@ function GuardResult({ scan }: { scan: GuardScan }) {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="glass-panel border-t-4 border-t-orange-500">
-          <CardHeader className="pb-2 items-center">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 rise-in">
+        <Card className="glass-panel relative overflow-hidden hover-lift">
+          <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full bg-orange-500/10 blur-2xl" />
+          <CardHeader className="relative pb-2 items-center">
             <CardDescription>Hardware Trust Score</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col items-center gap-2">
+          <CardContent className="relative flex flex-col items-center gap-2">
             <ScoreRing score={scan.trustScore ?? 0} invert size={110} />
             <div className="text-sm text-muted-foreground text-center">
               {scan.machineLabel ?? "Mac"}
@@ -516,10 +523,11 @@ function GuardResult({ scan }: { scan: GuardScan }) {
               <div
                 key={i}
                 className={cn(
-                  "flex items-start justify-between gap-4 p-3 rounded-md border bg-background/50",
+                  "flex items-start justify-between gap-4 p-3 rounded-md border bg-background/50 transition-colors duration-200 hover:bg-muted/40 rise-in",
                   d.isNew && !isTrusted && "border-orange-500/50",
                   isTrusted && "border-green-500/40",
                 )}
+                style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
               >
                 <div className="min-w-0 flex-1">
                   <div className="font-medium text-sm flex items-center gap-2 flex-wrap">
@@ -590,7 +598,8 @@ function GuardResult({ scan }: { scan: GuardScan }) {
           {scan.findings.map((f, i) => (
             <div
               key={i}
-              className="flex items-start gap-3 p-3 rounded-md border bg-background/50"
+              className="flex items-start gap-3 p-3 rounded-md border bg-background/50 transition-colors duration-200 hover:bg-muted/40 rise-in"
+              style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
             >
               <Badge
                 variant={
