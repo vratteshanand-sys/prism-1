@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Lightbulb } from "lucide-react";
-import { PrismMark } from "@/components/prism-mark";
 import { MODULES } from "@/lib/modules";
 import { useOnboarded } from "@/hooks/use-onboarded";
 import { cn } from "@/lib/utils";
@@ -16,12 +15,121 @@ const STEPS = [
   MODULES.reports,
 ];
 
+const RAINBOW = ["#ff4d4d", "#ff9f40", "#ffe14d", "#4ade80", "#38bdf8", "#5b7cff", "#b45bff"];
+
+/**
+ * Interactive prism-refracting-light hero — the splash screen centerpiece.
+ * A white beam enters, refracts through the glass, exits as a rainbow fan.
+ * Idle: continuous float + shimmer loop. On mouse move: parallax tilt (perspective
+ * rotate) tracking the cursor, like the glass is catching the light toward you.
+ */
+function PrismHero({ intensified }: { intensified: boolean }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  function handleMove(e: React.MouseEvent) {
+    const rect = wrapRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: py * -16, y: px * 22 });
+  }
+
+  return (
+    <div
+      ref={wrapRef}
+      onMouseMove={handleMove}
+      onMouseLeave={() => setTilt({ x: 0, y: 0 })}
+      className="relative w-full max-w-xl mx-auto"
+      style={{ perspective: "1000px" }}
+    >
+      {/* Ambient color wash behind the glass */}
+      <div
+        className="glow-breathe pointer-events-none absolute inset-0 blur-3xl"
+        style={{ background: "radial-gradient(ellipse at 45% 55%, hsl(224 80% 60% / 0.35), transparent 65%)" }}
+      />
+
+      <div
+        className="prism-float"
+        style={{
+          transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${intensified ? 1.04 : 1})`,
+          transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+          transformStyle: "preserve-3d",
+        }}
+      >
+        <svg viewBox="0 0 640 300" className="w-full h-auto relative z-10">
+          <defs>
+            <linearGradient id="prism-glass" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="hsl(210 90% 85% / 0.4)" />
+              <stop offset="100%" stopColor="hsl(224 70% 55% / 0.08)" />
+            </linearGradient>
+            <filter id="prism-glow" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="3.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          {/* Incoming white light beam — wide soft halo + crisp core, so it reads at any size.
+              Note: no filter here — a perfectly horizontal line has a zero-height bounding
+              box, and percentage-based SVG filter regions collapse to nothing on one, so the
+              glow filter silently no-ops on this element. The halo/core layering does the
+              same visual job without depending on the filter. */}
+          <line
+            x1="10" y1="150" x2="285" y2="150"
+            stroke="white" strokeLinecap="round" strokeWidth="10"
+            opacity="0.35"
+          />
+          <line
+            x1="10" y1="150" x2="285" y2="150"
+            stroke="white" strokeLinecap="round" strokeWidth="4"
+            className="beam-pulse"
+          />
+
+          {/* Rainbow fan, refracting out the far side of the glass */}
+          {RAINBOW.map((color, i) => (
+            <line
+              key={color}
+              x1="330" y1="150"
+              x2="628" y2={80 + i * 24}
+              stroke={color}
+              strokeWidth="3.5"
+              strokeLinecap="round"
+              filter="url(#prism-glow)"
+              className="rainbow-band"
+              style={{ animationDelay: `${i * 0.18}s`, opacity: intensified ? 1 : undefined }}
+            />
+          ))}
+
+          {/* Glass prism */}
+          <polygon
+            points="320,40 400,220 240,220"
+            fill="url(#prism-glass)"
+            stroke="hsl(210 90% 88% / 0.85)"
+            strokeWidth="1.75"
+            strokeLinejoin="round"
+            filter="url(#prism-glow)"
+          />
+          {/* Internal refraction lines, echoing the sidebar mark */}
+          <line x1="320" y1="100" x2="356" y2="220" stroke="white" strokeWidth="1" opacity="0.35" />
+          <line x1="320" y1="100" x2="284" y2="220" stroke="white" strokeWidth="1" opacity="0.22" />
+
+          {/* Glint where the beam strikes the glass */}
+          <circle cx="300" cy="150" r="5" fill="white" filter="url(#prism-glow)" className="sparkle-twinkle" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
 function Splash({ onEnter }: { onEnter: () => void }) {
   const [hovered, setHovered] = useState(false);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center cursor-pointer select-none"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center cursor-pointer select-none overflow-hidden"
       style={{ background: "hsl(222 28% 7%)" }}
       onClick={onEnter}
       onMouseEnter={() => setHovered(true)}
@@ -29,18 +137,9 @@ function Splash({ onEnter }: { onEnter: () => void }) {
       role="button"
       aria-label="Enter PRISM"
     >
-      <div className="flex flex-col items-center rise-in">
-        <div
-          className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-500"
-          style={{
-            background: "hsl(224 62% 58% / 0.12)",
-            color: "hsl(224 62% 60%)",
-            transform: hovered ? "scale(1.06)" : "scale(1)",
-          }}
-        >
-          <PrismMark className="w-11 h-11" />
-        </div>
-        <div className="text-5xl font-bold tracking-tight text-white">PRISM</div>
+      <div className="flex flex-col items-center rise-in w-full px-6">
+        <PrismHero intensified={hovered} />
+        <div className="text-5xl font-bold tracking-tight text-white mt-2">PRISM</div>
         <div
           className="text-xs tracking-[0.3em] uppercase mt-3 transition-all duration-500 overflow-hidden"
           style={{
@@ -57,7 +156,7 @@ function Splash({ onEnter }: { onEnter: () => void }) {
           className="text-xs text-white/40 mt-10 transition-opacity duration-700"
           style={{ opacity: hovered ? 0.7 : 0.35 }}
         >
-          Click anywhere to begin
+          Move your cursor, then click anywhere to begin
         </div>
       </div>
     </div>

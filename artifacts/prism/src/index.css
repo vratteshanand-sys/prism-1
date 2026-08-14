@@ -285,9 +285,47 @@
   animation: spotlight-sweep 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
 }
 
+/* ── Prism hero — splash screen centerpiece ── */
+
+/* Gentle continuous float, always running */
+@keyframes prism-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+.prism-float { animation: prism-float 5s ease-in-out infinite; }
+
+/* Incoming light beam — pulses like light actually traveling into the glass */
+@keyframes beam-pulse {
+  0%, 100% { opacity: 0.55; stroke-width: 2.5; }
+  50%      { opacity: 1;    stroke-width: 3.5; }
+}
+.beam-pulse { animation: beam-pulse 2.2s ease-in-out infinite; transform-origin: left center; }
+
+/* Rainbow bands shimmer with a staggered, non-uniform loop so it reads as alive, not mechanical */
+@keyframes rainbow-shimmer {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+.rainbow-band { animation: rainbow-shimmer 3s ease-in-out infinite; }
+
+/* Glint at the point the beam strikes the glass */
+@keyframes sparkle-twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50%      { opacity: 1;   transform: scale(1.3); }
+}
+.sparkle-twinkle { animation: sparkle-twinkle 1.8s ease-in-out infinite; transform-origin: center; }
+
+/* Ambient glow wash behind the hero — slow, colorful, non-distracting */
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(1.08); }
+}
+.glow-breathe { animation: glow-breathe 6s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   .score-ring-arc, .rise-in, .hover-lift, .press-scale, .tab-fade-in, .value-tick,
-  .nav-indicator-active, .icon-pop-in, .icon-wiggle, .spotlight-sweep {
+  .nav-indicator-active, .icon-pop-in, .icon-wiggle, .spotlight-sweep,
+  .prism-float, .beam-pulse, .rainbow-band, .sparkle-twinkle, .glow-breathe {
     animation: none !important;
     transition: none !important;
   }
