@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { useGetDashboardSummary, getGetDashboardSummaryQueryKey } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { getRiskBadgeVariant } from "@/lib/risk-utils";
-import { Activity, ArrowUpRight, AlertTriangle } from "lucide-react";
+import { Activity, ArrowUpRight, AlertTriangle, Info, Lightbulb } from "lucide-react";
 import { Link } from "wouter";
-import { MODULES, themeForLabel } from "@/lib/modules";
+import { MODULES, themeForLabel, type ModuleTheme } from "@/lib/modules";
 import { ScoreRing } from "@/components/score-ring";
 import { Explainer, GuidedTour } from "@/components/teachy";
 import { cn } from "@/lib/utils";
@@ -16,6 +19,7 @@ function StatValue({ value }: { value: number }) {
 
 export default function Dashboard() {
   const { data: summary, isLoading } = useGetDashboardSummary({ query: { queryKey: getGetDashboardSummaryQueryKey() } });
+  const [detail, setDetail] = useState<ModuleTheme | null>(null);
 
   if (isLoading) {
     return (
@@ -60,10 +64,10 @@ export default function Dashboard() {
               Explore PRISM
             </div>
             <h1 className="text-2xl font-bold tracking-tight">
-              {modules.length} ways to watch your digital life
+              Where do you want to start?
             </h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Every module does one job well. Pick where you want to start.
+              Tap a card to open it, or the <Info className="w-3 h-3 inline -mt-0.5" /> icon for what it does, with an example.
             </p>
             {/* One-time light sweep on first paint — decorative, purely additive */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
@@ -75,43 +79,88 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {/* Compact by design: icon + name only. Full explanation lives one click away in
+            the dialog, so 7 destinations don't compete for attention all at once. */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
           {modules.map((m, i) => {
             const Icon = m.theme.icon;
             return (
-              <Link key={m.theme.name} href={m.theme.href} className="block group">
-                <div
-                  className="relative overflow-hidden rounded-2xl border bg-card p-5 h-full hover-lift press-scale rise-in cursor-pointer"
-                  style={{ animationDelay: `${120 + i * 60}ms` }}
-                >
-                  {/* Tinted radial wash — module identity without a slapped-on border stripe */}
+              <div key={m.theme.name} className="relative group">
+                <Link href={m.theme.href} className="block">
                   <div
-                    className="pointer-events-none absolute -top-8 -right-8 w-28 h-28 rounded-full opacity-[0.12] blur-xl transition-opacity duration-300 group-hover:opacity-25"
-                    style={{ background: m.theme.hsl }}
-                  />
-                  <div className="relative flex items-start justify-between mb-3">
+                    className="relative overflow-hidden rounded-xl border bg-card px-4 py-3.5 h-full hover-lift press-scale rise-in cursor-pointer flex items-center gap-3"
+                    style={{ animationDelay: `${120 + i * 50}ms` }}
+                  >
                     <div
-                      className="icon-pop-in w-11 h-11 rounded-xl flex items-center justify-center"
-                      style={{ background: `color-mix(in srgb, ${m.theme.hsl} 14%, transparent)`, animationDelay: `${200 + i * 60}ms` }}
+                      className="pointer-events-none absolute -top-8 -right-8 w-20 h-20 rounded-full opacity-[0.12] blur-xl transition-opacity duration-300 group-hover:opacity-25"
+                      style={{ background: m.theme.hsl }}
+                    />
+                    <div
+                      className="icon-pop-in relative w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                      style={{ background: `color-mix(in srgb, ${m.theme.hsl} 14%, transparent)`, animationDelay: `${200 + i * 50}ms` }}
                     >
-                      <Icon className="icon-wiggle w-5 h-5" style={{ color: m.theme.hsl }} />
+                      <Icon className="icon-wiggle w-4 h-4" style={{ color: m.theme.hsl }} />
                     </div>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 mt-1" />
+                    <div className="relative min-w-0 flex-1">
+                      <div className="text-sm font-bold truncate" style={{ color: m.theme.hsl }}>
+                        {m.theme.name}
+                      </div>
+                      <div className="text-[0.7rem] text-muted-foreground/70 font-mono tabular-nums">
+                        <StatValue value={m.value} /> {m.value === 1 ? "scan" : "scans"}
+                      </div>
+                    </div>
+                    <ArrowUpRight className="relative w-3.5 h-3.5 text-muted-foreground opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 shrink-0" />
                   </div>
-                  <div className="relative text-base font-bold" style={{ color: m.theme.hsl }}>
-                    {m.theme.name}
-                  </div>
-                  <p className="relative text-sm text-muted-foreground mt-1 leading-relaxed line-clamp-3">
-                    {m.theme.does}
-                  </p>
-                  <div className="relative mt-3 text-xs font-mono font-medium text-muted-foreground/70 tabular-nums">
-                    <StatValue value={m.value} /> {m.value === 1 ? "scan" : "scans"} so far
-                  </div>
-                </div>
-              </Link>
+                </Link>
+                <button
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDetail(m.theme); }}
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-background border flex items-center justify-center text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:text-foreground hover:border-current z-10"
+                  aria-label={`What does ${m.theme.name} do?`}
+                >
+                  <Info className="w-3 h-3" />
+                </button>
+              </div>
             );
           })}
         </div>
+
+        <Dialog open={!!detail} onOpenChange={(open) => !open && setDetail(null)}>
+          <DialogContent className="sm:max-w-lg">
+            {detail && (
+              <>
+                <DialogHeader>
+                  <div className="flex items-center gap-3 mb-1">
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                      style={{ background: `color-mix(in srgb, ${detail.hsl} 14%, transparent)` }}
+                    >
+                      <detail.icon className="w-5 h-5" style={{ color: detail.hsl }} />
+                    </div>
+                    <DialogTitle style={{ color: detail.hsl }}>{detail.name}</DialogTitle>
+                  </div>
+                  <DialogDescription className="text-sm text-foreground/80 leading-relaxed">
+                    {detail.does}
+                  </DialogDescription>
+                </DialogHeader>
+                {detail.example && (
+                  <div className="flex gap-2.5 p-3.5 rounded-lg border bg-muted/40 text-sm leading-relaxed">
+                    <Lightbulb className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" />
+                    <div>
+                      <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1">Example</div>
+                      {detail.example}
+                    </div>
+                  </div>
+                )}
+                <DialogFooter className="sm:justify-between items-center gap-3">
+                  <p className="text-xs text-muted-foreground">{detail.protects}</p>
+                  <Link href={detail.href} onClick={() => setDetail(null)}>
+                    <Button className="press-scale shrink-0">Open {detail.name}</Button>
+                  </Link>
+                </DialogFooter>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* ── Header strip ── */}
         <div className="flex items-start justify-between gap-6 rise-in" style={{ animationDelay: "500ms" }}>
