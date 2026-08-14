@@ -37,7 +37,8 @@ export default function Dashboard() {
     { theme: MODULES.finguard,    value: summary.finguardAnalyses,  desc: "Transaction histories" },
     { theme: MODULES.devicescan,  value: summary.deviceScans,       desc: "Browser scans" },
     { theme: MODULES.guard,       value: summary.guardScans,        desc: "Hardware agent scans" },
-    { theme: { ...MODULES.devicescan, name: "Deep Scan", href: "/devicescan" },
+    { theme: { ...MODULES.devicescan, name: "Deep Scan", href: "/devicescan",
+        does: "Pairs with a terminal script on your Mac to check FileVault, firewall, SIP, and Gatekeeper status." },
       value: summary.deepScans, desc: "MacBook posture scans" },
   ];
 
@@ -52,13 +53,73 @@ export default function Dashboard() {
 
         <GuidedTour />
 
+        {/* ── Explore PRISM: module picker, first thing a new user sees ── */}
+        <div className="rise-in">
+          <div className="relative overflow-hidden">
+            <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">
+              Explore PRISM
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              {modules.length} ways to watch your digital life
+            </h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Every module does one job well. Pick where you want to start.
+            </p>
+            {/* One-time light sweep on first paint — decorative, purely additive */}
+            <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+              <div
+                className="spotlight-sweep absolute top-0 left-0 h-full w-16 opacity-40"
+                style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.5), transparent)" }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {modules.map((m, i) => {
+            const Icon = m.theme.icon;
+            return (
+              <Link key={m.theme.name} href={m.theme.href} className="block group">
+                <div
+                  className="relative overflow-hidden rounded-2xl border bg-card p-5 h-full hover-lift press-scale rise-in cursor-pointer"
+                  style={{ animationDelay: `${120 + i * 60}ms` }}
+                >
+                  {/* Tinted radial wash — module identity without a slapped-on border stripe */}
+                  <div
+                    className="pointer-events-none absolute -top-8 -right-8 w-28 h-28 rounded-full opacity-[0.12] blur-xl transition-opacity duration-300 group-hover:opacity-25"
+                    style={{ background: m.theme.hsl }}
+                  />
+                  <div className="relative flex items-start justify-between mb-3">
+                    <div
+                      className="icon-pop-in w-11 h-11 rounded-xl flex items-center justify-center"
+                      style={{ background: `color-mix(in srgb, ${m.theme.hsl} 14%, transparent)`, animationDelay: `${200 + i * 60}ms` }}
+                    >
+                      <Icon className="icon-wiggle w-5 h-5" style={{ color: m.theme.hsl }} />
+                    </div>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 mt-1" />
+                  </div>
+                  <div className="relative text-base font-bold" style={{ color: m.theme.hsl }}>
+                    {m.theme.name}
+                  </div>
+                  <p className="relative text-sm text-muted-foreground mt-1 leading-relaxed line-clamp-3">
+                    {m.theme.does}
+                  </p>
+                  <div className="relative mt-3 text-xs font-mono font-medium text-muted-foreground/70 tabular-nums">
+                    <StatValue value={m.value} /> {m.value === 1 ? "scan" : "scans"} so far
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
         {/* ── Header strip ── */}
-        <div className="flex items-start justify-between gap-6">
+        <div className="flex items-start justify-between gap-6 rise-in" style={{ animationDelay: "500ms" }}>
           <div>
             <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">
               Security Overview
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">Command Center</h1>
+            <h2 className="text-2xl font-bold tracking-tight">Command Center</h2>
             <p className="text-sm text-muted-foreground mt-0.5">
               All modules · live session
             </p>
@@ -84,43 +145,6 @@ export default function Dashboard() {
           <span className="font-semibold text-red-600 dark:text-red-400">red (80–100)</span> means act now.
           This ring averages the risk of everything scanned so far.
         </Explainer>
-
-        {/* ── Module scorecard grid ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {modules.map((m, i) => {
-            const Icon = m.theme.icon;
-            return (
-              <Link key={m.theme.name} href={m.theme.href} className="block group">
-                <div
-                  className="relative overflow-hidden rounded-xl border bg-card p-4 hover-lift press-scale rise-in cursor-pointer"
-                  style={{ animationDelay: `${i * 50}ms` }}
-                >
-                  {/* Tinted radial wash — module identity without a slapped-on border stripe */}
-                  <div
-                    className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-[0.12] blur-xl transition-opacity duration-300 group-hover:opacity-25"
-                    style={{ background: m.theme.hsl }}
-                  />
-                  <div className="relative flex items-center justify-between mb-3">
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
-                      style={{ background: `color-mix(in srgb, ${m.theme.hsl} 14%, transparent)` }}
-                    >
-                      <Icon className="w-4 h-4" style={{ color: m.theme.hsl }} />
-                    </div>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-                  </div>
-                  <div className="relative text-2xl font-mono font-bold tabular-nums">
-                    <StatValue value={m.value} />
-                  </div>
-                  <div className="relative text-sm font-medium mt-0.5" style={{ color: m.theme.hsl }}>
-                    {m.theme.name}
-                  </div>
-                  <div className="relative text-xs text-muted-foreground mt-0.5">{m.desc}</div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
 
         {/* ── Bottom row ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

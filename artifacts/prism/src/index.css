@@ -261,12 +261,38 @@
 }
 .nav-indicator-active { animation: indicator-grow 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
+/* Icon pop-in — for module-picker badges on first paint */
+@keyframes icon-pop-in {
+  from { opacity: 0; transform: scale(0.4) rotate(-15deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+.icon-pop-in { animation: icon-pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+/* Icon wiggle — playful hover feedback on module-picker cards */
+@keyframes icon-wiggle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25%      { transform: rotate(-10deg) scale(1.08); }
+  75%      { transform: rotate(10deg) scale(1.08); }
+}
+.group:hover .icon-wiggle { animation: icon-wiggle 0.5s ease-in-out; }
+
+/* One-time spotlight sweep across the module picker row on mount */
+@keyframes spotlight-sweep {
+  from { transform: translateX(-120%); }
+  to   { transform: translateX(220%); }
+}
+.spotlight-sweep {
+  animation: spotlight-sweep 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .score-ring-arc, .rise-in, .hover-lift, .press-scale, .tab-fade-in, .value-tick, .nav-indicator-active {
+  .score-ring-arc, .rise-in, .hover-lift, .press-scale, .tab-fade-in, .value-tick,
+  .nav-indicator-active, .icon-pop-in, .icon-wiggle, .spotlight-sweep {
     animation: none !important;
     transition: none !important;
   }
   .hover-lift:hover { transform: none; }
+  .group:hover .icon-wiggle { animation: none; }
 }
 
 /* Compliance report printing — force light background, avoid splitting findings across pages */
