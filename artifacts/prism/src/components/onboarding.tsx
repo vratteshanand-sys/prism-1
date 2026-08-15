@@ -195,35 +195,47 @@ function Overview({ onContinue }: { onContinue: () => void }) {
       </div>
 
       <div className="relative rise-in max-w-2xl text-center">
-        <div className="text-xs font-bold uppercase tracking-[0.35em] mb-4" style={{ color: "hsl(224 70% 68%)" }}>
-          What is PRISM?
+        <div className="relative rounded-3xl border border-white/15 bg-white/[0.04] backdrop-blur-sm px-6 py-10 sm:px-12 sm:py-12 mb-10">
+          <div
+            className="text-xs font-bold uppercase tracking-[0.35em] mb-4 text-white"
+            style={{ textShadow: "0 0 16px rgba(255,255,255,0.4)" }}
+          >
+            What is PRISM?
+          </div>
+          <h1
+            className="text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight mb-6"
+            style={{ textShadow: "0 0 30px rgba(255,255,255,0.35), 0 0 70px rgba(255,255,255,0.15)" }}
+          >
+            One lens.<br />Seven ways to watch your digital life.
+          </h1>
+          <p
+            className="text-white text-lg leading-relaxed max-w-xl mx-auto"
+            style={{ textShadow: "0 0 20px rgba(255,255,255,0.15)" }}
+          >
+            PRISM splits your security posture the way a glass prism splits light —
+            into distinct, color-coded beams. Each module below watches one angle:
+            your code, your AI content, the links you click, your money, and this
+            very device. Together they're one picture. Individually, each is sharp.
+          </p>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight mb-6">
-          One lens.<br />Seven ways to watch your digital life.
-        </h1>
-        <p className="text-white/70 text-lg leading-relaxed mb-10 max-w-xl mx-auto">
-          PRISM splits your security posture the way a glass prism splits light —
-          into distinct, color-coded beams. Each module below watches one angle:
-          your code, your AI content, the links you click, your money, and this
-          very device. Together they're one picture. Individually, each is sharp.
-        </p>
 
         {/* Quick colorful taste of what's coming — full detail is next, one at a time */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 mb-10">
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
           {STEPS.map((m, i) => {
             const Icon = m.icon;
             return (
               <div
                 key={m.key}
-                className="icon-pop-in flex items-center gap-2 px-3.5 py-2 rounded-full border"
+                className="icon-pop-in hover-lift flex items-center gap-2 px-4 py-2.5 rounded-full border-2 cursor-default"
                 style={{
-                  background: `color-mix(in srgb, ${m.hsl} 14%, transparent)`,
-                  borderColor: `color-mix(in srgb, ${m.hsl} 35%, transparent)`,
+                  background: `color-mix(in srgb, ${m.hsl} 16%, hsl(222 28% 10%))`,
+                  borderColor: `color-mix(in srgb, ${m.hsl} 55%, transparent)`,
+                  boxShadow: `0 0 20px -4px color-mix(in srgb, ${m.hsl} 60%, transparent)`,
                   animationDelay: `${300 + i * 90}ms`,
                 }}
               >
-                <Icon className="w-3.5 h-3.5" style={{ color: m.hsl }} />
-                <span className="text-xs font-bold" style={{ color: m.hsl }}>{m.name}</span>
+                <Icon className="w-4 h-4" style={{ color: m.hsl }} />
+                <span className="text-sm font-bold text-white">{m.name}</span>
               </div>
             );
           })}
