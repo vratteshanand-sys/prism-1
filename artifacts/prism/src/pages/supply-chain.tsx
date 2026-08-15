@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getRiskColor } from "@/lib/risk-utils";
-import { ShieldAlert, Trash2, Search, ChevronLeft, Package, FileCode, CheckCircle2 } from "lucide-react";
+import { ShieldAlert, Trash2, Search, ChevronLeft, Package, FileCode, CheckCircle2, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MODULES } from "@/lib/modules";
 import { ModuleBanner, Explainer, WhyWhatTo, severityAdvice } from "@/components/teachy";
@@ -79,6 +79,44 @@ function ScanCreator({ onSelect }: { onSelect: (id: number) => void }) {
           known security hole — your whole app inherits the problem. This scan checks every
           ingredient against a live database of known vulnerabilities.
         </Explainer>
+
+        {/* Why this matters + a real worked example, so the value is obvious before you paste anything */}
+        <Card className="rise-in glass-panel relative overflow-hidden border-amber-500/25" style={{ animationDelay: "100ms" }}>
+          <div className="pointer-events-none absolute -top-12 -right-12 w-48 h-48 rounded-full bg-amber-500/10 blur-3xl" />
+          <CardContent className="relative p-6 grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 items-center">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-2">Why use this</div>
+              <p className="text-sm leading-relaxed">
+                Every package you install can quietly bring known security holes into your app —
+                most teams find out only after an attacker does. This scan checks every dependency
+                you paste against a live database of real, disclosed vulnerabilities (OSV.dev),
+                so you catch the problem before it ships.
+              </p>
+            </div>
+            <ArrowRight className="hidden lg:block w-5 h-5 text-muted-foreground shrink-0" />
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">See it in action</div>
+                <Badge variant="outline" className="text-[0.6rem] uppercase tracking-wide">Example</Badge>
+              </div>
+              <div className="rounded-lg border border-dashed p-3.5 bg-background/60">
+                <div className="text-[0.7rem] font-mono text-muted-foreground mb-2">You paste:</div>
+                <code className="block text-xs font-mono bg-muted/60 rounded px-2.5 py-1.5 mb-3">
+                  {"{ \"dependencies\": { \"lodash\": \"4.17.15\" } }"}
+                </code>
+                <div className="text-[0.7rem] font-mono text-muted-foreground mb-2">PRISM flags:</div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-mono font-bold text-sm">lodash</span>
+                  <Badge variant="critical" className="uppercase text-[0.6rem]">high</Badge>
+                  <span className="text-xs text-muted-foreground font-mono">CVE-2020-8203</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                  Prototype-pollution flaw — fixed in <span className="font-mono font-semibold text-foreground">4.17.19</span>. Real teams running this exact version in production wouldn't know until they ran this scan.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <Card className="glass-panel relative overflow-hidden hover-lift">

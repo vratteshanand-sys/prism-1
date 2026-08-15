@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getRiskColor, getRiskBadgeVariant } from "@/lib/risk-utils";
-import { Fingerprint, Trash2, Search, ChevronLeft, Bot, AlertTriangle } from "lucide-react";
+import { Fingerprint, Trash2, Search, ChevronLeft, Bot, AlertTriangle, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from "recharts";
 import { MODULES } from "@/lib/modules";
@@ -77,6 +77,44 @@ function AnalysisCreator({ onSelect }: { onSelect: (id: number) => void }) {
           dimensions (safety, factuality, toxicity, bias, coherence, and hallucination
           risk) and points at the exact sentences that triggered concern.
         </Explainer>
+
+        <Card className="rise-in glass-panel relative overflow-hidden border-violet-500/25" style={{ animationDelay: "100ms" }}>
+          <div className="pointer-events-none absolute -top-12 -right-12 w-48 h-48 rounded-full bg-violet-500/10 blur-3xl" />
+          <CardContent className="relative p-6 grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 items-center">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-widest text-violet-600 dark:text-violet-400 mb-2">Why use this</div>
+              <p className="text-sm leading-relaxed">
+                AI-written content sounds confident whether or not it's true. If you publish,
+                send, or act on AI output without checking it, a single fabricated statistic
+                or unsafe claim can slip straight through. Sentinel reads it first and tells
+                you exactly which sentence to double-check, and why.
+              </p>
+            </div>
+            <ArrowRight className="hidden lg:block w-5 h-5 text-muted-foreground shrink-0" />
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">See it in action</div>
+                <Badge variant="outline" className="text-[0.6rem] uppercase tracking-wide">Example</Badge>
+              </div>
+              <div className="rounded-lg border border-dashed p-3.5 bg-background/60">
+                <div className="text-[0.7rem] font-mono text-muted-foreground mb-2">You paste an AI-written paragraph claiming:</div>
+                <div className="text-xs italic bg-muted/60 rounded px-2.5 py-1.5 mb-3">
+                  "...a 2019 study showing 73% of users prefer this approach..."
+                </div>
+                <div className="text-[0.7rem] font-mono text-muted-foreground mb-2">Sentinel flags:</div>
+                <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                  <Badge variant="outline" className="uppercase text-[0.6rem] font-mono">hallucination risk</Badge>
+                  <Badge variant="critical" className="uppercase text-[0.6rem]">high</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  That specific, uncited statistic is a classic fabrication pattern — sounds
+                  precise, cites nothing checkable. You'd see this exact sentence highlighted
+                  with the reason, before you ever repeat it as fact.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <Card className="glass-panel relative overflow-hidden hover-lift">

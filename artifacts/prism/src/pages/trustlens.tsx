@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getRiskColor } from "@/lib/risk-utils";
-import { Search, Link as LinkIcon, FileText, Cookie, AlertTriangle, AlertCircle, ClipboardList, Scale } from "lucide-react";
+import { Search, Link as LinkIcon, FileText, Cookie, AlertTriangle, AlertCircle, ClipboardList, Scale, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MODULES } from "@/lib/modules";
 import { ModuleBanner, Explainer } from "@/components/teachy";
@@ -55,6 +55,39 @@ export default function TrustLens() {
           applicable. This is an automated first-pass screen, not legal advice — use it
           to triage what a human reviewer should look at next.
         </Explainer>
+
+        <Card className="rise-in glass-panel relative overflow-hidden border-cyan-500/25" style={{ animationDelay: "100ms" }}>
+          <div className="pointer-events-none absolute -top-12 -right-12 w-48 h-48 rounded-full bg-cyan-500/10 blur-3xl" />
+          <CardContent className="relative p-6 grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 items-center">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-widest text-cyan-600 dark:text-cyan-400 mb-2">Why use this</div>
+              <p className="text-sm leading-relaxed">
+                Dark patterns and shaky privacy terms aren't always obvious from reading —
+                they're designed to slip past you. TrustLens screens the exact link, policy,
+                or banner text against patterns regulators already recognize, and names the
+                specific law it may violate, so you're not guessing whether something's actually a problem.
+              </p>
+            </div>
+            <ArrowRight className="hidden lg:block w-5 h-5 text-muted-foreground shrink-0" />
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">See it in action</div>
+                <Badge variant="outline" className="text-[0.6rem] uppercase tracking-wide">Example</Badge>
+              </div>
+              <div className="rounded-lg border border-dashed p-3.5 bg-background/60 space-y-3">
+                <div>
+                  <div className="text-[0.7rem] font-mono text-muted-foreground mb-1">A checkout link like:</div>
+                  <code className="block text-[0.7rem] font-mono bg-muted/60 rounded px-2 py-1 mb-1 truncate">shop.example.com/cart?utm=urgent-offer</code>
+                  <div className="flex items-center gap-1.5"><RegulationTag regulation="EU DSA Art. 25" /> <span className="text-xs text-muted-foreground">dark-pattern signal</span></div>
+                </div>
+                <div>
+                  <div className="text-[0.7rem] font-mono text-muted-foreground mb-1">A cookie banner where "Accept All" is huge and "Reject" is tiny gray text:</div>
+                  <div className="flex items-center gap-1.5"><RegulationTag regulation="GDPR Art. 7(3)" /> <span className="text-xs text-muted-foreground">consent imbalance flagged</span></div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Tabs defaultValue="url" className="w-full">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto md:h-14 bg-muted/50 p-1 rounded-xl gap-1">

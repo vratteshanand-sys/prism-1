@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getRiskColor } from "@/lib/risk-utils";
-import { ShieldCheck, Trash2, ChevronLeft, FileSpreadsheet, CheckCircle2, AlertOctagon } from "lucide-react";
+import { ShieldCheck, Trash2, ChevronLeft, FileSpreadsheet, CheckCircle2, AlertOctagon, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MODULES } from "@/lib/modules";
 import { ModuleBanner, Explainer, WhyWhatTo, severityAdvice } from "@/components/teachy";
@@ -77,6 +77,43 @@ function AnalysisCreator({ onSelect }: { onSelect: (id: number) => void }) {
           transaction list the way a bank fraud analyst would and flags the rows that
           fit those patterns.
         </Explainer>
+
+        <Card className="rise-in glass-panel relative overflow-hidden border-emerald-500/25" style={{ animationDelay: "100ms" }}>
+          <div className="pointer-events-none absolute -top-12 -right-12 w-48 h-48 rounded-full bg-emerald-500/10 blur-3xl" />
+          <CardContent className="relative p-6 grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 items-center">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">Why use this</div>
+              <p className="text-sm leading-relaxed">
+                One suspicious wire transfer buried in a long statement is easy to miss when
+                you're skimming. FinGuard doesn't skim — it checks every row against the
+                patterns banks themselves use to catch fraud, and tells you exactly which
+                transaction to worry about and why, instead of leaving you to eyeball a spreadsheet.
+              </p>
+            </div>
+            <ArrowRight className="hidden lg:block w-5 h-5 text-muted-foreground shrink-0" />
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">See it in action</div>
+                <Badge variant="outline" className="text-[0.6rem] uppercase tracking-wide">Example</Badge>
+              </div>
+              <div className="rounded-lg border border-dashed p-3.5 bg-background/60">
+                <div className="text-[0.7rem] font-mono text-muted-foreground mb-2">You paste a row like:</div>
+                <code className="block text-xs font-mono bg-muted/60 rounded px-2.5 py-1.5 mb-3">
+                  2026-08-13, Wire Transfer, -$50,000, Offshore LLC, 3:14 AM
+                </code>
+                <div className="text-[0.7rem] font-mono text-muted-foreground mb-2">FinGuard flags:</div>
+                <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                  <Badge variant="critical" className="uppercase text-[0.6rem]">high</Badge>
+                  <span className="text-xs text-muted-foreground">3 signals stacked</span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Large amount + brand-new payee + off-hours timing, all in one transaction —
+                  with a plain-language reason and what to do next.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <Card className="glass-panel relative overflow-hidden hover-lift">
