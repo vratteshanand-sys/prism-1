@@ -163,6 +163,84 @@ function Splash({ onEnter }: { onEnter: () => void }) {
   );
 }
 
+/**
+ * Whole-app overview — bridges the splash (just a mark) and the per-module
+ * walkthrough (one thing at a time). Answers "what is this, broadly" with
+ * real color and motion before narrowing into details.
+ */
+function Overview({ onContinue }: { onContinue: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6 overflow-hidden cursor-default"
+      style={{ background: "hsl(222 28% 7%)" }}
+    >
+      {/* Full-spectrum ambient wash — the "many colors, one lens" idea made literal */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        {RAINBOW.map((color, i) => (
+          <div
+            key={color}
+            className="glow-breathe absolute rounded-full blur-3xl"
+            style={{
+              background: color,
+              opacity: 0.14,
+              width: "22rem",
+              height: "22rem",
+              left: `${4 + i * 13}%`,
+              top: `${10 + (i % 3) * 24}%`,
+              animationDelay: `${i * 0.35}s`,
+              animationDuration: `${5 + (i % 3)}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="relative rise-in max-w-2xl text-center">
+        <div className="text-xs font-bold uppercase tracking-[0.35em] mb-4" style={{ color: "hsl(224 70% 68%)" }}>
+          What is PRISM?
+        </div>
+        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight mb-6">
+          One lens.<br />Seven ways to watch your digital life.
+        </h1>
+        <p className="text-white/70 text-lg leading-relaxed mb-10 max-w-xl mx-auto">
+          PRISM splits your security posture the way a glass prism splits light —
+          into distinct, color-coded beams. Each module below watches one angle:
+          your code, your AI content, the links you click, your money, and this
+          very device. Together they're one picture. Individually, each is sharp.
+        </p>
+
+        {/* Quick colorful taste of what's coming — full detail is next, one at a time */}
+        <div className="flex flex-wrap items-center justify-center gap-2.5 mb-10">
+          {STEPS.map((m, i) => {
+            const Icon = m.icon;
+            return (
+              <div
+                key={m.key}
+                className="icon-pop-in flex items-center gap-2 px-3.5 py-2 rounded-full border"
+                style={{
+                  background: `color-mix(in srgb, ${m.hsl} 14%, transparent)`,
+                  borderColor: `color-mix(in srgb, ${m.hsl} 35%, transparent)`,
+                  animationDelay: `${300 + i * 90}ms`,
+                }}
+              >
+                <Icon className="w-3.5 h-3.5" style={{ color: m.hsl }} />
+                <span className="text-xs font-bold" style={{ color: m.hsl }}>{m.name}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={onContinue}
+          className="inline-flex items-center gap-2 text-sm font-bold px-7 py-3 rounded-lg text-white press-scale hover-lift transition-all"
+          style={{ background: "hsl(224 62% 55%)" }}
+        >
+          Show me how each one works <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Walkthrough({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(0);
   const module = STEPS[step];
@@ -171,31 +249,48 @@ function Walkthrough({ onComplete }: { onComplete: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6 overflow-hidden"
       style={{ background: "hsl(222 28% 7%)" }}
     >
-      {/* Progress dots */}
-      <div className="flex items-center gap-2 mb-10">
+      {/* Ambient glow matching the current module's color — recolors per step */}
+      <div
+        key={module.key}
+        className="glow-breathe pointer-events-none absolute rounded-full blur-3xl"
+        style={{
+          background: module.hsl,
+          opacity: 0.22,
+          width: "36rem",
+          height: "36rem",
+          left: "50%",
+          top: "45%",
+          transform: "translate(-50%, -50%)",
+        }}
+        aria-hidden
+      />
+
+      {/* Progress dots — each colored to its own module, so the trail ahead reads as a spectrum */}
+      <div className="relative flex items-center gap-2 mb-10">
         {STEPS.map((s, i) => (
           <div
             key={s.key}
             className="h-1.5 rounded-full transition-all duration-300"
             style={{
               width: i === step ? "1.75rem" : "0.4rem",
-              background: i <= step ? "hsl(224 62% 60%)" : "hsl(222 28% 20%)",
+              background: i <= step ? s.hsl : "hsl(222 28% 20%)",
+              opacity: i <= step ? 1 : 0.6,
             }}
           />
         ))}
       </div>
 
-      <div key={module.key} className="w-full max-w-lg rise-in">
+      <div key={module.key} className="relative w-full max-w-lg rise-in">
         <div className="text-xs font-mono text-white/40 mb-3 tracking-widest">
           {String(step + 1).padStart(2, "0")} / {String(STEPS.length).padStart(2, "0")}
         </div>
 
         <div
           className="icon-pop-in w-16 h-16 rounded-2xl flex items-center justify-center mb-5"
-          style={{ background: `color-mix(in srgb, ${module.hsl} 16%, transparent)` }}
+          style={{ background: `color-mix(in srgb, ${module.hsl} 18%, transparent)`, boxShadow: `0 0 40px -8px ${module.hsl}` }}
         >
           <Icon className="w-8 h-8" style={{ color: module.hsl }} />
         </div>
@@ -208,8 +303,11 @@ function Walkthrough({ onComplete }: { onComplete: () => void }) {
         </p>
 
         {module.example && (
-          <div className="flex gap-3 p-4 rounded-xl border border-white/10 bg-white/5 text-sm leading-relaxed text-white/70">
-            <Lightbulb className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+          <div
+            className="flex gap-3 p-4 rounded-xl border text-sm leading-relaxed text-white/70"
+            style={{ borderColor: `color-mix(in srgb, ${module.hsl} 25%, transparent)`, background: `color-mix(in srgb, ${module.hsl} 6%, transparent)` }}
+          >
+            <Lightbulb className="w-4 h-4 shrink-0 mt-0.5" style={{ color: module.hsl }} />
             <div>
               <div className="text-xs font-bold uppercase tracking-wide text-white/40 mb-1">Example</div>
               {module.example}
@@ -233,7 +331,7 @@ function Walkthrough({ onComplete }: { onComplete: () => void }) {
             <button
               onClick={onComplete}
               className="flex items-center gap-1.5 text-sm font-bold px-6 py-2.5 rounded-lg text-white press-scale hover-lift transition-all"
-              style={{ background: "hsl(224 62% 55%)" }}
+              style={{ background: module.hsl }}
             >
               Enter PRISM
             </button>
@@ -241,7 +339,7 @@ function Walkthrough({ onComplete }: { onComplete: () => void }) {
             <button
               onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}
               className="flex items-center gap-1.5 text-sm font-bold px-6 py-2.5 rounded-lg text-white press-scale hover-lift transition-all"
-              style={{ background: "hsl(224 62% 55%)" }}
+              style={{ background: module.hsl }}
             >
               Next <ChevronRight className="w-4 h-4" />
             </button>
@@ -253,10 +351,13 @@ function Walkthrough({ onComplete }: { onComplete: () => void }) {
 }
 
 function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
-  const [phase, setPhase] = useState<"splash" | "walkthrough">("splash");
+  const [phase, setPhase] = useState<"splash" | "overview" | "walkthrough">("splash");
 
   if (phase === "splash") {
-    return <Splash onEnter={() => setPhase("walkthrough")} />;
+    return <Splash onEnter={() => setPhase("overview")} />;
+  }
+  if (phase === "overview") {
+    return <Overview onContinue={() => setPhase("walkthrough")} />;
   }
   return <Walkthrough onComplete={onComplete} />;
 }
